@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>MacOs修改Mailto链接默认打开方式</title>
+      <link href="2021/01/21/Macos-mailto/"/>
+      <url>2021/01/21/Macos-mailto/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>装了edge后, mailto链接都会使用edge打开, 并且跳转到gmail, 研究了半天, 找到了关掉这个设置的地方.</p><p>在edge打开这个设置界面:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">edge://settings/content/handlers</span><br></pre></td></tr></table></figure><p>删除 mailto 链接的gmail, 或者关掉这个设置.</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> MAC </tag>
+            
+            <tag> mailto </tag>
+            
+            <tag> edge </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>mac vm 序列号</title>
       <link href="2021/01/12/mac-vm-sn/"/>
       <url>2021/01/12/mac-vm-sn/</url>
