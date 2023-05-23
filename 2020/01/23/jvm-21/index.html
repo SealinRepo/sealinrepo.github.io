@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.0.0-rc1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.sealin.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="var ap &#x3D; new APlayer({             element: document.getElementById(&quot;aplayer-zVtzTpuB&quot;),             narrow: false,             autoplay: false,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="21 | 方法内联（下）">
+<meta property="og:url" content="http://www.sealin.net/2020/01/23/jvm-21/index.html">
+<meta property="og:site_name" content="Sealin">
+<meta property="og:description" content="var ap &#x3D; new APlayer({             element: document.getElementById(&quot;aplayer-zVtzTpuB&quot;),             narrow: false,             autoplay: false,">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.sealin.net/images/2020/01/23/ef3e88a0-3db1-11ea-87eb-3d1d349c50f2.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/01/23/fe22a310-3db1-11ea-87eb-3d1d349c50f2.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/01/23/07e14be0-3db2-11ea-87eb-3d1d349c50f2.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/01/23/1b12a060-3db2-11ea-87eb-3d1d349c50f2.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/01/23/44575ab0-3db2-11ea-87eb-3d1d349c50f2.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/01/23/70f9bef0-3db2-11ea-87eb-3d1d349c50f2.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/01/23/7dfa2540-3db2-11ea-87eb-3d1d349c50f2.png">
+<meta property="article:published_time" content="2020-01-23T07:33:28.000Z">
+<meta property="article:modified_time" content="2023-05-23T01:43:32.486Z">
+<meta property="article:author" content="Sealin">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.sealin.net/images/2020/01/23/ef3e88a0-3db1-11ea-87eb-3d1d349c50f2.png">
+
+<link rel="canonical" href="http://www.sealin.net/2020/01/23/jvm-21/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>21 | 方法内联（下） | Sealin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Sealin" type="application/atom+xml">
+<link rel="stylesheet" href="/assets/css/APlayer.min.css" class="aplayer-style-marker">
+<script src="/assets/js/APlayer.min.js" class="aplayer-script-marker"></script>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sealin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">初闻不解词间意，再听已是曲中人。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/23/jvm-21/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Sealin">
+      <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sealin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          21 | 方法内联（下）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-23 15:33:28" itemprop="dateCreated datePublished" datetime="2020-01-23T15:33:28+08:00">2020-01-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-23 09:43:32" itemprop="dateModified" datetime="2023-05-23T09:43:32+08:00">2023-05-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JAVA/" itemprop="url" rel="index"><span itemprop="name">JAVA</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JAVA/%E6%B7%B1%E5%85%A5%E6%8B%86%E8%A7%A3-Java-%E8%99%9A%E6%8B%9F%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">深入拆解 Java 虚拟机</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        
+        <div id="aplayer-zVtzTpuB" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+            <pre class="aplayer-lrc-content"></pre>
+        </div>
+        <script>
+          var ap = new APlayer({
+            element: document.getElementById("aplayer-zVtzTpuB"),
+            narrow: false,
+            autoplay: false,
+            showlrc: false,
+            music: {
+              title: "音频21",
+              author: "郑雨迪",
+              url: "https://res001.geekbang.org/resource/audio/b4/f3/b431f57c281a1f0623a95ab12c631bf3.mp3",
+              pic: "",
+              lrc: ""
+            }
+          });
+          window.aplayers || (window.aplayers = []);
+          window.aplayers.push(ap);
+        </script>
+
+<p>在上一篇中，我举的例子都是静态方法调用，即时编译器可以轻易地确定唯一的目标方法。</p>
+<p>然而，对于需要动态绑定的虚方法调用来说，即时编译器则需要先对虚方法调用进行去虚化（devirtualize），即转换为一个或多个直接调用，然后才能进行方法内联。</p>
+<p><strong>即时编译器的去虚化方式可分为完全去虚化以及条件去虚化（guarded devirtualization）。</strong></p>
+<p><strong>完全去虚化</strong>是通过类型推导或者类层次分析（class hierarchy analysis），识别虚方法调用的唯一目标方法，从而将其转换为直接调用的一种优化手段。它的关键在于证明虚方法调用的目标方法是唯一的。</p>
+<p><strong>条件去虚化</strong>则是将虚方法调用转换为若干个类型测试以及直接调用的一种优化手段。它的关键在于找出需要进行比较的类型。</p>
+<p>在介绍具体的去虚化方式之前，我们先来看一段代码。这里我定义了一个抽象类 BinaryOp，其中包含一个抽象方法 apply。BinaryOp 类有两个子类 Add 和 Sub，均实现了 apply 方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">BinaryOp</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="type">int</span> <span class="title function_">apply</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span>;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Add</span> <span class="keyword">extends</span> <span class="title class_">BinaryOp</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">apply</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Sub</span> <span class="keyword">extends</span> <span class="title class_">BinaryOp</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">apply</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> a - b;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面我便用这个例子来逐一讲解这几种去虚化方式。</p>
+<h1 id="基于类型推导的完全去虚化"><a href="#基于类型推导的完全去虚化" class="headerlink" title="基于类型推导的完全去虚化"></a>基于类型推导的完全去虚化</h1><p>基于类型推导的完全去虚化将通过数据流分析推导出调用者的动态类型，从而确定具体的目标方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">foo</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="type">BinaryOp</span> <span class="variable">op</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Add</span>();</span><br><span class="line">  <span class="keyword">return</span> op.apply(<span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">bar</span><span class="params">(BinaryOp op)</span> &#123;</span><br><span class="line">  op = (Add) op;</span><br><span class="line">  <span class="keyword">return</span> op.apply(<span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>举个例子，上面这段代码中的 foo 方法和 bar 方法均会调用 apply 方法，且调用者的声明类型皆为 BinaryOp。这意味着 Java 编译器会将其编译为 invokevirtual 指令，调用 BinaryOp.apply 方法。</p>
+<p>前两篇中我曾提到过，在 Sea-of-Nodes 的 IR 系统中，变量不复存在，取而代之的是具体值。这些具体值的类型往往要比变量的声明类型精确。</p>
+<p><img src="/images/2020/01/23/ef3e88a0-3db1-11ea-87eb-3d1d349c50f2.png" alt="image.png"></p>
+<h1 id="foo-方法的-IR-图（方法内联前）"><a href="#foo-方法的-IR-图（方法内联前）" class="headerlink" title="foo 方法的 IR 图（方法内联前）"></a>foo 方法的 IR 图（方法内联前）</h1><p><img src="/images/2020/01/23/fe22a310-3db1-11ea-87eb-3d1d349c50f2.png" alt="image.png"></p>
+<h1 id="bar-方法的-IR-图（方法内联前）"><a href="#bar-方法的-IR-图（方法内联前）" class="headerlink" title="bar 方法的 IR 图（方法内联前）"></a>bar 方法的 IR 图（方法内联前）</h1><p>在上面两张 IR 图中，方法调用的调用者（即 8 号 CallTarget 节点的第一个依赖值）分别为 2 号 New 节点，以及 5 号 Pi 节点。后者可以简单看成强制转换后的精确类型。由于这两个节点的类型均被精确为 Add 类，因此，原 invokevirtual 指令对应的 9 号 invoke 节点都被识别对 Add.apply 方法的调用。</p>
+<p>经过对该具体方法的内联之后，对应的 IR 图如下所示：</p>
+<p><img src="/images/2020/01/23/07e14be0-3db2-11ea-87eb-3d1d349c50f2.png" alt="image.png"></p>
+<h1 id="bar-方法的-IR-图（方法内联后）"><a href="#bar-方法的-IR-图（方法内联后）" class="headerlink" title="bar 方法的 IR 图（方法内联后）"></a>bar 方法的 IR 图（方法内联后）</h1><p>可以看到，通过将字节码转换为 Sea-of-Nodes IR 之后，即时编译器便可以直接去虚化，并将唯一的目标方法进一步内联进来。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">notInlined</span><span class="params">(BinaryOp op)</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (op <span class="keyword">instanceof</span> Add) &#123;</span><br><span class="line">    <span class="keyword">return</span> op.apply(<span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不过，对于上面这段代码中的 notInlined 方法，尽管理论上即时编译器能够推导出调用者的动态类型为 Add，但是 C2 和 Graal 都没有这么做。</p>
+<p>其原因在于类型推导属于全局优化，本身比较浪费时间；另一方面，就算不进行基于类型推导的完全去虚化，也有接下来的基于类层次分析的去虚化，以及条件去虚化兜底，覆盖大部分的代码情况。</p>
+<p><img src="/images/2020/01/23/1b12a060-3db2-11ea-87eb-3d1d349c50f2.png" alt="image.png"></p>
+<h1 id="notInlined-方法的-IR-图（方法内联失败后）"><a href="#notInlined-方法的-IR-图（方法内联失败后）" class="headerlink" title="notInlined 方法的 IR 图（方法内联失败后）"></a>notInlined 方法的 IR 图（方法内联失败后）</h1><p>因此，C2 和 Graal 决定，如果生成 Sea-of-Nodes IR 后，调用者的动态类型已能够直接确定，那么就进行这项去虚化。如果需要额外的数据流分析方能确定，那么干脆不做，以节省编译时间，并依赖接下来的去虚化手段进行优化。</p>
+<h1 id="基于类层次分析的完全去虚化"><a href="#基于类层次分析的完全去虚化" class="headerlink" title="基于类层次分析的完全去虚化"></a>基于类层次分析的完全去虚化</h1><p>基于类层次分析的完全去虚化通过分析 Java 虚拟机中所有已被加载的类，判断某个抽象方法或者接口方法是否仅有一个实现。如果是，那么对这些方法的调用将只能调用至该具体实现中。</p>
+<p>在上面的例子中，假设在编译 foo、bar 或 notInlined 方法时，Java 虚拟机仅加载了 Add。那么，BinaryOp.apply 方法只有 Add.apply 这么一个具体实现。因此，当即时编译器碰到对 BinaryOp.apply 的调用时，便可直接内联 Add.apply 的内容。</p>
+<p>那么问题来了，即时编译器如何保证在今后的执行过程中，BinaryOp.apply 方法还是只有 Add.apply 这么一个具体实现呢？</p>
+<p>事实上，它无法保证。因为 Java 虚拟机有可能在上述编译完成之后加载 Sub 类，从而引入另一个 BinaryOp.apply 方法的具体实现 Sub.apply。</p>
+<p>Java 虚拟机的做法是为当前编译结果注册若干个假设（assumption），假定某抽象类只有一个子类，或者某抽象方法只有一个具体实现，又或者某类没有子类等。</p>
+<p>之后，每当新的类被加载，Java 虚拟机便会重新验证这些假设。如果某个假设不再成立，那么 Java 虚拟机便会对其所属的编译结果进行去优化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">test</span><span class="params">(BinaryOp op)</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> op.apply(<span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上面这段代码中的 test 方法为例。假设即时编译的时候，如果类层次分析得出 BinaryOp 类只有 Add 一个子类的结论，那么即时编译器可以注册一个假设，假定抽象方法 BinaryOp.apply 有且仅有 Add.apply 这个具体实现。</p>
+<p>基于这个假设，原虚方法调用便可直接被去虚化为对 Add.apply 方法的调用。如果在之后的运行过程中，Java 虚拟机又加载了 Sub 类，那么该假设失效，Java 虚拟机需要触发 test 方法编译结果的去优化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">test</span><span class="params">(Add op)</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> op.apply(<span class="number">2</span>, <span class="number">1</span>); <span class="comment">// 仍需添加假设</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>事实上，即便调用者的声明类型为 Add，即时编译器仍需为之添加假设。这是因为 Java 虚拟机不能保证没有重写了 apply 方法的 Add 类的子类。</p>
+<p>为了保证这里 apply 方法的语义，即时编译器需要假设 Add 类没有子类。当然，通过将 Add 类标注为 final，可以避开这个问题。</p>
+<p>可以看到，即时编译器并不要求目标方法使用 final 修饰符。只要目标方法事实上是 final 的（effective final），便可以进行相应的去虚化以及内联。</p>
+<p>不过，如果使用了 final 修饰符，即时编译器便可以不用生成对应的假设。这将使编译结果更加精简，并减少类加载时所需验证的内容。</p>
+<p><img src="/images/2020/01/23/44575ab0-3db2-11ea-87eb-3d1d349c50f2.png" alt="image.png"></p>
+<h1 id="test-方法的-IR-图（方法内联后）"><a href="#test-方法的-IR-图（方法内联后）" class="headerlink" title="test 方法的 IR 图（方法内联后）"></a>test 方法的 IR 图（方法内联后）</h1><p>让我们回到原本的例子中。从 test 方法的 IR 图可以看出，生成的代码无须检测调用者的动态类型是否为 Add，便直接执行内联之后的 Add.apply 方法中的内容（2+1 经过常量折叠之后得到 3，对应 13 号常数节点）。这是因为动态类型检测已被移至假设之中了。</p>
+<p>然而，对于接口方法调用，该去虚化手段则不能移除动态类型检测。这是因为在执行 invokeinterface 指令时，Java 虚拟机必须对调用者的动态类型进行测试，看它是否实现了目标接口方法所在的接口。</p>
+<blockquote>
+<p>Java 类验证器将接口类型直接看成 Object 类型，所以有可能出现声明类型为接口，实际类型没有继承该接口的情况，如下例所示。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A.java</span></span><br><span class="line"><span class="keyword">interface</span> <span class="title class_">I</span> &#123;&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">(I obj)</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    test(<span class="keyword">new</span> <span class="title class_">B</span>());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// B.java</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">B</span> <span class="keyword">implements</span> <span class="title class_">I</span> &#123; &#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// Step 1: compile A.java and B.java</span></span><br><span class="line"><span class="comment">// Step 2: remove &quot;implements I&quot; from B.java, and compile B.java</span></span><br><span class="line"><span class="comment">// Step 3: run A</span></span><br></pre></td></tr></table></figure>
+
+<p>既然这一类型测试无法避免，C2 干脆就不对接口方法调用进行基于类层次分析的完全去虚化，而是依赖于接下来的条件去虚化。</p>
+<h1 id="条件去虚化"><a href="#条件去虚化" class="headerlink" title="条件去虚化"></a>条件去虚化</h1><p>前面提到，条件去虚化通过向代码中添加若干个类型比较，将虚方法调用转换为若干个直接调用。</p>
+<p>具体的原理非常简单，是将调用者的动态类型，依次与 Java 虚拟机所收集的类型 Profile 中记录的类型相比较。如果匹配，则直接调用该记录类型所对应的目标方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">test</span><span class="params">(BinaryOp op)</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> op.apply(<span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们继续使用前面的例子。假设编译时类型 Profile 记录了调用者的两个类型 Sub 和 Add，那么即时编译器可以据此进行条件去虚化，依次比较调用者的动态类型是否为 Sub 或者 Add，并内联相应的方法。其伪代码如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">test</span><span class="params">(BinaryOp op)</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (op.getClass() == Sub.class) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span> - <span class="number">1</span>; <span class="comment">// inlined Sub.apply</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (op.getClass() == Add.class) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">2</span> + <span class="number">1</span>; <span class="comment">// inlined Add.apply</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    ... <span class="comment">// 当匹配不到类型 Profile 中的类型怎么办？</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果遍历完类型 Profile 中的所有记录，仍旧匹配不到调用者的动态类型，那么即时编译器有两种选择。</p>
+<p>第一，如果类型 Profile 是完整的，也就是说，所有出现过的动态类型都被记录至类型 Profile 之中，那么即时编译器可以让程序进行去优化，重新收集类型 Profile，对应的 IR 图如下所示（这里 27 号 TypeSwitch 节点等价于前面伪代码中的多个 if 语句）：</p>
+<p><img src="/images/2020/01/23/70f9bef0-3db2-11ea-87eb-3d1d349c50f2.png" alt="image.png"></p>
+<h1 id="当匹配不到动态类型时进行去优化"><a href="#当匹配不到动态类型时进行去优化" class="headerlink" title="当匹配不到动态类型时进行去优化"></a>当匹配不到动态类型时进行去优化</h1><p>第二，如果类型 Profile 是不完整的，也就是说，某些出现过的动态类型并没有记录至类型 Profile 之中，那么重新收集并没有多大作用。此时，即时编译器可以让程序进行原本的虚调用，通过内联缓存进行调用，或者通过方法表进行动态绑定。对应的 IR 图如下所示：</p>
+<p><img src="/images/2020/01/23/7dfa2540-3db2-11ea-87eb-3d1d349c50f2.png" alt="image.png"></p>
+<h1 id="当匹配不到动态类型时进行虚调用（仅在-Graal-中使用。）"><a href="#当匹配不到动态类型时进行虚调用（仅在-Graal-中使用。）" class="headerlink" title="当匹配不到动态类型时进行虚调用（仅在 Graal 中使用。）"></a>当匹配不到动态类型时进行虚调用（仅在 Graal 中使用。）</h1><p>在 C2 中，如果类型 Profile 是不完整的，即时编译器压根不会进行条件去虚化，而是直接使用内联缓存或者方法表。</p>
+<h1 id="总结与实践"><a href="#总结与实践" class="headerlink" title="总结与实践"></a>总结与实践</h1><p>今天我介绍了即时编译器去虚化的几种方法。</p>
+<p>完全去虚化通过类型推导或者类层次分析，将虚方法调用转换为直接调用。它的关键在于证明虚方法调用的目标方法是唯一的。</p>
+<p>条件去虚化通过向代码中增添类型比较，将虚方法调用转换为一个个的类型测试以及对应该类型的直接调用。它将借助 Java 虚拟机所收集的类型 Profile。</p>
+<p>今天的实践环节，我们来重现因类加载导致去优化的过程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Run with java -XX:CompileCommand=&#x27;dontinline JITTest.test&#x27; -XX:+PrintCompilation JITTest</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JITTest</span> &#123;</span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">BinaryOp</span> &#123;</span><br><span class="line">      <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="type">int</span> <span class="title function_">apply</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span>;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Add</span> <span class="keyword">extends</span> <span class="title class_">BinaryOp</span> &#123;</span><br><span class="line">      <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">apply</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">          <span class="keyword">return</span> a + b;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Sub</span> <span class="keyword">extends</span> <span class="title class_">BinaryOp</span> &#123;</span><br><span class="line">      <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">apply</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">          <span class="keyword">return</span> a - b;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">test</span><span class="params">(BinaryOp op)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> op.apply(<span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    <span class="type">Add</span> <span class="variable">add</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Add</span>();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">400_000</span>; i++) &#123;</span><br><span class="line">      test(add);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    Thread.sleep(<span class="number">2000</span>);</span><br><span class="line">    System.out.println(<span class="string">&quot;Loading Sub&quot;</span>);</span><br><span class="line">    Sub[] array = <span class="keyword">new</span> <span class="title class_">Sub</span>[<span class="number">0</span>]; <span class="comment">// Load class Sub</span></span><br><span class="line">    <span class="comment">// Expect output: &quot;JITTest::test (7 bytes)   made not entrant&quot;</span></span><br><span class="line">    Thread.sleep(<span class="number">2000</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/23/jvm-20/" rel="prev" title="20 | 方法内联（上）">
+      <i class="fa fa-chevron-left"></i> 20 | 方法内联（上）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/01/23/jvm-22/" rel="next" title="22 | HotSpot虚拟机的intrinsic">
+      22 | HotSpot虚拟机的intrinsic <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%B1%BB%E5%9E%8B%E6%8E%A8%E5%AF%BC%E7%9A%84%E5%AE%8C%E5%85%A8%E5%8E%BB%E8%99%9A%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">基于类型推导的完全去虚化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#foo-%E6%96%B9%E6%B3%95%E7%9A%84-IR-%E5%9B%BE%EF%BC%88%E6%96%B9%E6%B3%95%E5%86%85%E8%81%94%E5%89%8D%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">foo 方法的 IR 图（方法内联前）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#bar-%E6%96%B9%E6%B3%95%E7%9A%84-IR-%E5%9B%BE%EF%BC%88%E6%96%B9%E6%B3%95%E5%86%85%E8%81%94%E5%89%8D%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">bar 方法的 IR 图（方法内联前）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#bar-%E6%96%B9%E6%B3%95%E7%9A%84-IR-%E5%9B%BE%EF%BC%88%E6%96%B9%E6%B3%95%E5%86%85%E8%81%94%E5%90%8E%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">bar 方法的 IR 图（方法内联后）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#notInlined-%E6%96%B9%E6%B3%95%E7%9A%84-IR-%E5%9B%BE%EF%BC%88%E6%96%B9%E6%B3%95%E5%86%85%E8%81%94%E5%A4%B1%E8%B4%A5%E5%90%8E%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">notInlined 方法的 IR 图（方法内联失败后）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%B1%BB%E5%B1%82%E6%AC%A1%E5%88%86%E6%9E%90%E7%9A%84%E5%AE%8C%E5%85%A8%E5%8E%BB%E8%99%9A%E5%8C%96"><span class="nav-number">6.</span> <span class="nav-text">基于类层次分析的完全去虚化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#test-%E6%96%B9%E6%B3%95%E7%9A%84-IR-%E5%9B%BE%EF%BC%88%E6%96%B9%E6%B3%95%E5%86%85%E8%81%94%E5%90%8E%EF%BC%89"><span class="nav-number">7.</span> <span class="nav-text">test 方法的 IR 图（方法内联后）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%8E%BB%E8%99%9A%E5%8C%96"><span class="nav-number">8.</span> <span class="nav-text">条件去虚化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BD%93%E5%8C%B9%E9%85%8D%E4%B8%8D%E5%88%B0%E5%8A%A8%E6%80%81%E7%B1%BB%E5%9E%8B%E6%97%B6%E8%BF%9B%E8%A1%8C%E5%8E%BB%E4%BC%98%E5%8C%96"><span class="nav-number">9.</span> <span class="nav-text">当匹配不到动态类型时进行去优化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BD%93%E5%8C%B9%E9%85%8D%E4%B8%8D%E5%88%B0%E5%8A%A8%E6%80%81%E7%B1%BB%E5%9E%8B%E6%97%B6%E8%BF%9B%E8%A1%8C%E8%99%9A%E8%B0%83%E7%94%A8%EF%BC%88%E4%BB%85%E5%9C%A8-Graal-%E4%B8%AD%E4%BD%BF%E7%94%A8%E3%80%82%EF%BC%89"><span class="nav-number">10.</span> <span class="nav-text">当匹配不到动态类型时进行虚调用（仅在 Graal 中使用。）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E5%AE%9E%E8%B7%B5"><span class="nav-number">11.</span> <span class="nav-text">总结与实践</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Sealin</p>
+  <div class="site-description" itemprop="description">不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sealin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

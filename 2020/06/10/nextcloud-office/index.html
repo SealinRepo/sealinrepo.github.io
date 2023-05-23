@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.0.0-rc1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.sealin.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="简述使用nextcloud运行网盘服务，再加入onlyoffice&#x2F;documentserver实现在线编辑功能。 运行nextcloud将以下几个目录持久化到宿主机，防止配置和数据丢失 123&#x2F;var&#x2F;www&#x2F;html&#x2F;data&#x2F;var&#x2F;www&#x2F;html&#x2F;config&#x2F;var&#x2F;www&#x2F;html&#x2F;custom_apps 同时，为容器传入redis环境变量，以触发nextcloud的缓存机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker搭建nextcloud个人网盘在线编辑office文件">
+<meta property="og:url" content="http://www.sealin.net/2020/06/10/nextcloud-office/index.html">
+<meta property="og:site_name" content="Sealin">
+<meta property="og:description" content="简述使用nextcloud运行网盘服务，再加入onlyoffice&#x2F;documentserver实现在线编辑功能。 运行nextcloud将以下几个目录持久化到宿主机，防止配置和数据丢失 123&#x2F;var&#x2F;www&#x2F;html&#x2F;data&#x2F;var&#x2F;www&#x2F;html&#x2F;config&#x2F;var&#x2F;www&#x2F;html&#x2F;custom_apps 同时，为容器传入redis环境变量，以触发nextcloud的缓存机">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.sealin.net/images/2020/06/10/4f2961cb-a0ea-4b71-bd1f-096af7ade94e.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/06/10/6bf4a030-6a95-44ad-b1a5-dcec1cf21edc.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/06/10/ea543d47-0989-4ccc-8d82-07c6c1d47d74.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/06/10/42687ab2-bab6-4860-b23a-532a69ad714c.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/06/10/adb9827d-64ac-4646-bf1c-739c62571243.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/06/10/20cc66d3-c432-439b-8d26-f6ed3769b206.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/06/10/9d35969c-0d32-43fc-9349-4e4f4bc38d0b.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/06/10/3aa69808-f4fb-4756-98d9-53d4f1fcf16d.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/06/10/13bc3a09-4146-4ff6-a760-596c973535f4.png">
+<meta property="article:published_time" content="2020-06-10T03:37:35.000Z">
+<meta property="article:modified_time" content="2023-05-23T01:43:32.495Z">
+<meta property="article:author" content="Sealin">
+<meta property="article:tag" content="nextcloud">
+<meta property="article:tag" content="网盘">
+<meta property="article:tag" content="在线文档">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.sealin.net/images/2020/06/10/4f2961cb-a0ea-4b71-bd1f-096af7ade94e.png">
+
+<link rel="canonical" href="http://www.sealin.net/2020/06/10/nextcloud-office/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>docker搭建nextcloud个人网盘在线编辑office文件 | Sealin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Sealin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sealin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">初闻不解词间意，再听已是曲中人。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/06/10/nextcloud-office/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Sealin">
+      <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sealin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          docker搭建nextcloud个人网盘在线编辑office文件
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-06-10 11:37:35" itemprop="dateCreated datePublished" datetime="2020-06-10T11:37:35+08:00">2020-06-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-23 09:43:32" itemprop="dateModified" datetime="2023-05-23T09:43:32+08:00">2023-05-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">工具</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h1><p>使用nextcloud运行网盘服务，再加入onlyoffice&#x2F;documentserver实现在线编辑功能。</p>
+<h1 id="运行nextcloud"><a href="#运行nextcloud" class="headerlink" title="运行nextcloud"></a>运行nextcloud</h1><p>将以下几个目录持久化到宿主机，防止配置和数据丢失</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/var/www/html/data</span><br><span class="line">/var/www/html/config</span><br><span class="line">/var/www/html/custom_apps</span><br></pre></td></tr></table></figure>
+<p>同时，为容器传入redis环境变量，以触发nextcloud的缓存机制，缓存的环境变量名称可以通过 &#x2F;var&#x2F;www&#x2F;html&#x2F;config&#x2F;redis.config.php 看到，内容如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span> (<span class="title function_ invoke__">getenv</span>(<span class="string">&#x27;REDIS_HOST&#x27;</span>)) &#123;</span><br><span class="line">  <span class="variable">$CONFIG</span> = <span class="keyword">array</span> (</span><br><span class="line">    <span class="string">&#x27;memcache.distributed&#x27;</span> =&gt; <span class="string">&#x27;\OC\Memcache\Redis&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;memcache.locking&#x27;</span> =&gt; <span class="string">&#x27;\OC\Memcache\Redis&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;redis&#x27;</span> =&gt; <span class="keyword">array</span>(</span><br><span class="line">      <span class="string">&#x27;host&#x27;</span> =&gt; <span class="title function_ invoke__">getenv</span>(<span class="string">&#x27;REDIS_HOST&#x27;</span>),</span><br><span class="line">      <span class="string">&#x27;port&#x27;</span> =&gt; <span class="title function_ invoke__">getenv</span>(<span class="string">&#x27;REDIS_HOST_PORT&#x27;</span>) ?: <span class="number">6379</span>,</span><br><span class="line">      <span class="string">&#x27;password&#x27;</span> =&gt; <span class="title function_ invoke__">getenv</span>(<span class="string">&#x27;REDIS_HOST_PASSWORD&#x27;</span>),</span><br><span class="line">    ),</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到如果存在REDIS_HOST这个环境变量，就可以触发缓存，我看网上很多文章的做法是修改apcu.config.php，手动加入以上redis配置代码块，感觉没这必要。<br>运行容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name cloud -p 888:80 -v /var/data/nextcloud/apps:/var/www/html/custom_apps -v /var/data/nextcloud/config:/var/www/html/config -v /var/data/nextcloud/data:/var/www/html/data -e REDIS_HOST=<span class="string">&#x27;192.168.11.83&#x27;</span> -e REDIS_HOST_PORT=<span class="string">&#x27;6380&#x27;</span> -e REDIS_HOST_PASSWORD=<span class="string">&#x27;your-password&#x27;</span> nextcloud:17.0.1</span><br></pre></td></tr></table></figure>
+
+<p>启动后稍等片刻，访问<a href="http://ip:888，即可看到网盘安装界面。">http://ip:888，即可看到网盘安装界面。</a><br>推荐选择mysql作为数据库。</p>
+<h1 id="安装onlyoffice服务"><a href="#安装onlyoffice服务" class="headerlink" title="安装onlyoffice服务"></a>安装onlyoffice服务</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -i -t -d --name officeserver -p 51000:80 --restart=always onlyoffice/documentserver</span><br></pre></td></tr></table></figure>
+
+<p>如果运行没问题，进入<a href="http://ip:51000可以看到如下界面">http://ip:51000可以看到如下界面</a><br><img src="/images/2020/06/10/4f2961cb-a0ea-4b71-bd1f-096af7ade94e.png" alt="image.png"></p>
+<h1 id="安装nextcloud插件"><a href="#安装nextcloud插件" class="headerlink" title="安装nextcloud插件"></a>安装nextcloud插件</h1><p>由于国内网络环境不够因特乃熊，网盘里的插件管理界面99%的时间是打不开的，等两个小时也只能显示白板（至少我这边是这样）。<br>所以使用离线方式安装插件。</p>
+<h2 id="下载插件"><a href="#下载插件" class="headerlink" title="下载插件"></a>下载插件</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /var/data/nextcloud/apps</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/ONLYOFFICE/onlyoffice-nextcloud.git onlyoffice</span><br><span class="line"><span class="comment"># 33是nextcloud访问目录和文件需要的权限</span></span><br><span class="line"><span class="built_in">chown</span> -R 33:sealin onlyoffice</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置插件"><a href="#配置插件" class="headerlink" title="配置插件"></a>配置插件</h2><p>将插件源码下载到apps目录以后，最好重启下nextcloud,再去启用插件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker restart cloud</span><br></pre></td></tr></table></figure>
+
+<p>重启后进入页面，到插件设置<br><img src="/images/2020/06/10/6bf4a030-6a95-44ad-b1a5-dcec1cf21edc.png" alt="image.png"></p>
+<p>启用列表中新出现的onlyoffice插件<br><img src="/images/2020/06/10/ea543d47-0989-4ccc-8d82-07c6c1d47d74.png" alt="image.png"></p>
+<p>启用完成后进入系统设置，左侧的选项会多出一个onlyoffice<br><img src="/images/2020/06/10/42687ab2-bab6-4860-b23a-532a69ad714c.png" alt="image.png"></p>
+<p>填写自己的documentserver服务IP和端口<br><img src="/images/2020/06/10/adb9827d-64ac-4646-bf1c-739c62571243.png" alt="image.png"></p>
+<p>点击保存后，如果验证51000端口的服务没问题，会出现允许使用在线编辑的格式选项。<br><img src="/images/2020/06/10/20cc66d3-c432-439b-8d26-f6ed3769b206.png" alt="image.png"></p>
+<p>勾选需要的格式后，就可以到网盘主界面的文件列表中添加一个比如word文档，来试试在线编辑了。<br><img src="/images/2020/06/10/9d35969c-0d32-43fc-9349-4e4f4bc38d0b.png" alt="image.png"><br>可以看到多出来了几个新建文件的格式，试试word<br><img src="/images/2020/06/10/3aa69808-f4fb-4756-98d9-53d4f1fcf16d.png" alt="image.png"><br><img src="/images/2020/06/10/13bc3a09-4146-4ff6-a760-596c973535f4.png" alt="image.png"><br>带劲</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/nextcloud/" rel="tag"># nextcloud</a>
+              <a href="/tags/%E7%BD%91%E7%9B%98/" rel="tag"># 网盘</a>
+              <a href="/tags/%E5%9C%A8%E7%BA%BF%E6%96%87%E6%A1%A3/" rel="tag"># 在线文档</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/01/nexus-docker/" rel="prev" title="Nexus3作为Docker仓库登陆401">
+      <i class="fa fa-chevron-left"></i> Nexus3作为Docker仓库登陆401
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/28/mac-iterm-power/" rel="next" title="Mac下iTerm2使用电池时滚动不连贯">
+      Mac下iTerm2使用电池时滚动不连贯 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">简述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%90%E8%A1%8Cnextcloud"><span class="nav-number">2.</span> <span class="nav-text">运行nextcloud</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85onlyoffice%E6%9C%8D%E5%8A%A1"><span class="nav-number">3.</span> <span class="nav-text">安装onlyoffice服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85nextcloud%E6%8F%92%E4%BB%B6"><span class="nav-number">4.</span> <span class="nav-text">安装nextcloud插件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E6%8F%92%E4%BB%B6"><span class="nav-number">4.1.</span> <span class="nav-text">下载插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%8F%92%E4%BB%B6"><span class="nav-number">4.2.</span> <span class="nav-text">配置插件</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Sealin</p>
+  <div class="site-description" itemprop="description">不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sealin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

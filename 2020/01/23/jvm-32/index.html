@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.0.0-rc1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.sealin.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="var ap &#x3D; new APlayer({             element: document.getElementById(&quot;aplayer-XgpcObPI&quot;),             narrow: false,             autoplay: false,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="32 | JNI的运行机制">
+<meta property="og:url" content="http://www.sealin.net/2020/01/23/jvm-32/index.html">
+<meta property="og:site_name" content="Sealin">
+<meta property="og:description" content="var ap &#x3D; new APlayer({             element: document.getElementById(&quot;aplayer-XgpcObPI&quot;),             narrow: false,             autoplay: false,">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-01-23T09:45:26.000Z">
+<meta property="article:modified_time" content="2023-05-23T01:43:32.490Z">
+<meta property="article:author" content="Sealin">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://www.sealin.net/2020/01/23/jvm-32/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>32 | JNI的运行机制 | Sealin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Sealin" type="application/atom+xml">
+<link rel="stylesheet" href="/assets/css/APlayer.min.css" class="aplayer-style-marker">
+<script src="/assets/js/APlayer.min.js" class="aplayer-script-marker"></script>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sealin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">初闻不解词间意，再听已是曲中人。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/23/jvm-32/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Sealin">
+      <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sealin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          32 | JNI的运行机制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-23 17:45:26" itemprop="dateCreated datePublished" datetime="2020-01-23T17:45:26+08:00">2020-01-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-23 09:43:32" itemprop="dateModified" datetime="2023-05-23T09:43:32+08:00">2023-05-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%98%85%E8%AF%BB/" itemprop="url" rel="index"><span itemprop="name">阅读</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E6%8B%86%E8%A7%A3-Java-%E8%99%9A%E6%8B%9F%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">深入拆解 Java 虚拟机</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        
+        <div id="aplayer-XgpcObPI" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+            <pre class="aplayer-lrc-content"></pre>
+        </div>
+        <script>
+          var ap = new APlayer({
+            element: document.getElementById("aplayer-XgpcObPI"),
+            narrow: false,
+            autoplay: false,
+            showlrc: false,
+            music: {
+              title: "音频32",
+              author: "郑雨迪",
+              url: "https://res001.geekbang.org/resource/audio/83/22/835e43c39382b3f56e7466537b3d5622.mp3",
+              pic: "",
+              lrc: ""
+            }
+          });
+          window.aplayers || (window.aplayers = []);
+          window.aplayers.push(ap);
+        </script>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>我们经常会遇见 Java 语言较难表达，甚至是无法表达的应用场景。比如我们希望使用汇编语言（如 X86_64 的 SIMD 指令）来提升关键代码的性能；再比如，我们希望调用 Java 核心类库无法提供的，某个体系架构或者操作系统特有的功能。</p>
+<p>在这种情况下，我们往往会牺牲可移植性，在 Java 代码中调用 C&#x2F;C++ 代码（下面简述为 C 代码），并在其中实现所需功能。这种跨语言的调用，便需要借助 Java 虚拟机的 Java Native Interface（JNI）机制。</p>
+<p>关于 JNI 的例子，你应该特别熟悉 Java 中标记为native的、没有方法体的方法（下面统称为 native 方法）。当在 Java 代码中调用这些 native 方法时，Java 虚拟机将通过 JNI，调用至对应的 C 函数（下面将 native 方法对应的 C 实现统称为 C 函数）中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Object</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">native</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>举个例子，Object.hashCode方法便是一个 native 方法。它对应的 C 函数将计算对象的哈希值，并缓存在对象头、栈上锁记录（轻型锁）或对象监视锁（重型锁所使用的 monitor）中，以确保该值在对象的生命周期之内不会变更。</p>
+<h1 id="native-方法的链接"><a href="#native-方法的链接" class="headerlink" title="native 方法的链接"></a>native 方法的链接</h1><p>在调用 native 方法前，Java 虚拟机需要将该 native 方法链接至对应的 C 函数上。</p>
+<p>链接方式主要有两种。第一种是让 Java 虚拟机自动查找符合默认命名规范的 C 函数，并且链接起来。</p>
+<p>事实上，我们并不需要记住所谓的命名规范，而是采用javac -h命令，便可以根据 Java 程序中的 native 方法声明，自动生成包含符合命名规范的 C 函数的头文件。</p>
+<p>举个例子，在下面这段代码中，Foo类有三个 native 方法，分别为静态方法foo以及两个重载的实例方法bar。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.example;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Foo</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title function_">foo</span><span class="params">()</span>;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title function_">bar</span><span class="params">(<span class="type">int</span> i, <span class="type">long</span> j)</span>;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title function_">bar</span><span class="params">(String s, Object o)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过执行javac -h . org&#x2F;example&#x2F;Foo.java命令，我们将在当前文件夹（对应-h后面跟着的.）生成名为org_example_Foo.h的头文件。其内容如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* DO NOT EDIT THIS FILE - it is machine generated */</span></span><br><span class="line">#include &lt;jni.h&gt;</span><br><span class="line"><span class="comment">/* Header for class org_example_Foo */</span></span><br><span class="line"> </span><br><span class="line">#ifndef _Included_org_example_Foo</span><br><span class="line">#define _Included_org_example_Foo</span><br><span class="line">#ifdef __cplusplus</span><br><span class="line">extern <span class="string">&quot;C&quot;</span> &#123;</span><br><span class="line">#endif</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Class:     org_example_Foo</span></span><br><span class="line"><span class="comment"> * Method:    foo</span></span><br><span class="line"><span class="comment"> * Signature: ()V</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">JNIEXPORT <span class="keyword">void</span> JNICALL <span class="title function_">Java_org_example_Foo_foo</span></span><br><span class="line">  <span class="params">(JNIEnv *, jclass)</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Class:     org_example_Foo</span></span><br><span class="line"><span class="comment"> * Method:    bar</span></span><br><span class="line"><span class="comment"> * Signature: (IJ)V</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">JNIEXPORT <span class="keyword">void</span> JNICALL <span class="title function_">Java_org_example_Foo_bar__IJ</span></span><br><span class="line">  <span class="params">(JNIEnv *, jobject, jint, jlong)</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Class:     org_example_Foo</span></span><br><span class="line"><span class="comment"> * Method:    bar</span></span><br><span class="line"><span class="comment"> * Signature: (Ljava/lang/String;Ljava/lang/Object;)V</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">JNIEXPORT <span class="keyword">void</span> JNICALL <span class="title function_">Java_org_example_Foo_bar__Ljava_lang_String_2Ljava_lang_Object_2</span></span><br><span class="line">  <span class="params">(JNIEnv *, jobject, jstring, jobject)</span>;</span><br><span class="line"> </span><br><span class="line">#ifdef __cplusplus</span><br><span class="line">&#125;</span><br><span class="line">#endif</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+
+<p>这里我简单讲解一下该命名规范。</p>
+<p>首先，native 方法对应的 C 函数都需要以Java_为前缀，之后跟着完整的包名和方法名。由于 C 函数名不支持&#x2F;字符，因此我们需要将&#x2F;转换为_，而原本方法名中的_符号，则需要转换为_1。</p>
+<p>举个例子，org.example包下Foo类的foo方法，Java 虚拟机会将其自动链接至名为Java_org_example_Foo_foo的 C 函数中。</p>
+<p>当某个类出现重载的 native 方法时，Java 虚拟机还会将参数类型纳入自动链接对象的考虑范围之中。具体的做法便是在前面 C 函数名的基础上，追加__以及方法描述符作为后缀。</p>
+<p>方法描述符的特殊符号同样会被替换掉，如引用类型所使用的;会被替换为_2，数组类型所使用的[会被替换为_3。</p>
+<p>基于此命名规范，你可以手动拼凑上述代码中，Foo类的两个bar方法所能自动链接的 C 函数名，并用javac -h命令所生成的结果来验证一下。</p>
+<p>第二种链接方式则是在 C 代码中主动链接。</p>
+<p>这种链接方式对 C 函数名没有要求。通常我们会使用一个名为registerNatives的 native 方法，并按照第一种链接方式定义所能自动链接的 C 函数。在该 C 函数中，我们将手动链接该类的其他 native 方法。</p>
+<p>举个例子，Object类便拥有一个registerNatives方法，所对应的 C 代码如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注：Object 类的 registerNatives 方法的实现位于 java.base 模块里的 C 代码中</span></span><br><span class="line"><span class="keyword">static</span> JNINativeMethod methods[] = &#123;</span><br><span class="line">    &#123;<span class="string">&quot;hashCode&quot;</span>,    <span class="string">&quot;()I&quot;</span>,                    (<span class="keyword">void</span> *)&amp;JVM_IHashCode&#125;,</span><br><span class="line">    &#123;<span class="string">&quot;wait&quot;</span>,        <span class="string">&quot;(J)V&quot;</span>,                   (<span class="keyword">void</span> *)&amp;JVM_MonitorWait&#125;,</span><br><span class="line">    &#123;<span class="string">&quot;notify&quot;</span>,      <span class="string">&quot;()V&quot;</span>,                    (<span class="keyword">void</span> *)&amp;JVM_MonitorNotify&#125;,</span><br><span class="line">    &#123;<span class="string">&quot;notifyAll&quot;</span>,   <span class="string">&quot;()V&quot;</span>,                    (<span class="keyword">void</span> *)&amp;JVM_MonitorNotifyAll&#125;,</span><br><span class="line">    &#123;<span class="string">&quot;clone&quot;</span>,       <span class="string">&quot;()Ljava/lang/Object;&quot;</span>,   (<span class="keyword">void</span> *)&amp;JVM_Clone&#125;,</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line">JNIEXPORT <span class="keyword">void</span> JNICALL</span><br><span class="line"><span class="title function_">Java_java_lang_Object_registerNatives</span><span class="params">(JNIEnv *env, jclass cls)</span></span><br><span class="line">&#123;</span><br><span class="line">    (*env)-&gt;RegisterNatives(env, cls,</span><br><span class="line">                            methods, sizeof(methods)/sizeof(methods[<span class="number">0</span>]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到，上面这段代码中的 C 函数将调用RegisterNatives API，注册Object类中其他 native 方法所要链接的 C 函数。并且，这些 C 函数的名字并不符合默认命名规则。</p>
+<p>当使用第二种方式进行链接时，我们需要在其他 native 方法被调用之前完成链接工作。因此，我们往往会在类的初始化方法里调用该registerNatives方法。具体示例如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Object</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title function_">registerNatives</span><span class="params">()</span>;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        registerNatives();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面我们采用第一种链接方式，并且实现其中的bar(String, Object)方法。如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// foo.c</span></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include <span class="string">&quot;org_example_Foo.h&quot;</span></span><br><span class="line"> </span><br><span class="line">JNIEXPORT <span class="keyword">void</span> JNICALL <span class="title function_">Java_org_example_Foo_bar__Ljava_lang_String_2Ljava_lang_Object_2</span></span><br><span class="line">  <span class="params">(JNIEnv *env, jobject thisObject, jstring str, jobject obj)</span> &#123;</span><br><span class="line">  printf(<span class="string">&quot;Hello, World\n&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后，我们可以通过 gcc 命令将其编译成为动态链接库：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 该命令仅适用于 macOS</span></span><br><span class="line">$ gcc -I<span class="variable">$JAVA_HOME</span>/include -I<span class="variable">$JAVA_HOME</span>/include/darwin -o libfoo.dylib -shared foo.c</span><br></pre></td></tr></table></figure>
+
+<p>这里需要注意的是，动态链接库的名字须以lib为前缀，以.dylib(或 Linux 上的.so）为扩展名。在 Java 程序中，我们可以通过System.loadLibrary(“foo”)方法来加载libfoo.dylib，如下述代码所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.example;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Foo</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title function_">foo</span><span class="params">()</span>;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title function_">bar</span><span class="params">(<span class="type">int</span> i, <span class="type">long</span> j)</span>;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title function_">bar</span><span class="params">(String s, Object o)</span>;</span><br><span class="line"> </span><br><span class="line">  <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0xDEADBEEF</span>;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      System.loadLibrary(<span class="string">&quot;foo&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (UnsatisfiedLinkError e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">      System.exit(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">Foo</span>().bar(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果libfoo.dylib不在当前路径下，我们可以在启动 Java 虚拟机时配置java.library.path参数，使其指向包含libfoo.dylib的文件夹。具体命令如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ java -Djava.library.path=/PATH/TO/DIR/CONTAINING/libfoo.dylib org.example.Foo</span><br><span class="line">Hello, World</span><br></pre></td></tr></table></figure>
+
+<h1 id="JNI-的-API"><a href="#JNI-的-API" class="headerlink" title="JNI 的 API"></a>JNI 的 API</h1><p>在 C 代码中，我们也可以使用 Java 的语言特性，如 instanceof 测试等。这些功能都是通过特殊的 JNI 函数（<a href="https://docs.oracle.com/en/java/javase/11/docs/specs/jni/functions.html">JNI Functions</a>）来实现的。</p>
+<p>Java 虚拟机会将所有 JNI 函数的函数指针聚合到一个名为JNIEnv的数据结构之中。</p>
+<p>这是一个线程私有的数据结构。Java 虚拟机会为每个线程创建一个JNIEnv，并规定 C 代码不能将当前线程的JNIEnv共享给其他线程，否则 JNI 函数的正确性将无法保证。</p>
+<p>这么设计的原因主要有两个。一是给 JNI 函数提供一个单独命名空间。二是允许 Java 虚拟机通过更改函数指针替换 JNI 函数的具体实现，例如从附带参数类型检测的慢速版本，切换至不做参数类型检测的快速版本。</p>
+<p>在 HotSpot 虚拟机中，JNIEnv被内嵌至 Java 线程的数据结构之中。部分虚拟机代码甚至会从JNIEnv的地址倒推出 Java 线程的地址。因此，如果在其他线程中使用当前线程的JNIEnv，会使这部分代码错误识别当前线程。</p>
+<p>JNI 会将 Java 层面的基本类型以及引用类型映射为另一套可供 C 代码使用的数据结构。其中，基本类型的对应关系如下表所示：</p>
+<p>引用类型对应的数据结构之间也存在着继承关系，具体如下所示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">jobject</span><br><span class="line">|- jclass (java.lang.Class objects)</span><br><span class="line">|- jstring (java.lang.String objects)</span><br><span class="line">|- jthrowable (java.lang.Throwable objects)</span><br><span class="line">|- jarray (arrays)</span><br><span class="line">   |- jobjectArray (object arrays)</span><br><span class="line">   |- jbooleanArray (boolean arrays)</span><br><span class="line">   |- jbyteArray (byte arrays)</span><br><span class="line">   |- jcharArray (<span class="type">char</span> arrays)</span><br><span class="line">   |- jshortArray (<span class="type">short</span> arrays)</span><br><span class="line">   |- jintArray (<span class="type">int</span> arrays)</span><br><span class="line">   |- jlongArray (<span class="type">long</span> arrays)</span><br><span class="line">   |- jfloatArray (<span class="type">float</span> arrays)</span><br><span class="line">   |- jdoubleArray (<span class="type">double</span> arrays)</span><br></pre></td></tr></table></figure>
+
+<p>我们回头看看Foo类 3 个 native 方法对应的 C 函数的参数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">JNIEXPORT <span class="keyword">void</span> JNICALL <span class="title function_">Java_org_example_Foo_foo</span></span><br><span class="line">  <span class="params">(JNIEnv *, jclass)</span>;</span><br><span class="line"> </span><br><span class="line">JNIEXPORT <span class="keyword">void</span> JNICALL <span class="title function_">Java_org_example_Foo_bar__IJ</span></span><br><span class="line">  <span class="params">(JNIEnv *, jobject, jint, jlong)</span>;</span><br><span class="line"> </span><br><span class="line">JNIEXPORT <span class="keyword">void</span> JNICALL <span class="title function_">Java_org_example_Foo_bar__Ljava_lang_String_2Ljava_lang_Object_2</span>  <span class="params">(JNIEnv *, jobject, jstring, jobject)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>静态 native 方法foo将接收两个参数，分别为存放 JNI 函数的JNIEnv指针，以及一个jclass参数，用来指代定义该 native 方法的类，即Foo类。</p>
+<p>两个实例 native 方法bar的第二个参数则是jobject类型的，用来指代该 native 方法的调用者，也就是Foo类的实例。</p>
+<p>如果 native 方法声明了参数，那么对应的 C 函数将接收这些参数。在我们的例子中，第一个bar方法声明了 int 型和 long 型的参数，对应的 C 函数则接收 jint 和 jlong 类型的参数；第二个bar方法声明了 String 类型和 Object 类型的参数，对应的 C 函数则接收 jstring 和 jobject 类型的参数。</p>
+<p>下面，我们继续修改上一小节中的foo.c，并在 C 代码中获取Foo类实例的i字段。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// foo.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;org_example_Foo.h&quot;</span></span></span><br><span class="line"> </span><br><span class="line">JNIEXPORT <span class="type">void</span> JNICALL <span class="title function_">Java_org_example_Foo_bar__Ljava_lang_String_2Ljava_lang_Object_2</span></span><br><span class="line">  <span class="params">(JNIEnv *env, jobject thisObject, jstring str, jobject obj)</span> &#123;</span><br><span class="line">  jclass cls = (*env)-&gt;GetObjectClass(env, thisObject);</span><br><span class="line">  jfieldID fieldID = (*env)-&gt;GetFieldID(env, cls, <span class="string">&quot;i&quot;</span>, <span class="string">&quot;I&quot;</span>);</span><br><span class="line">  jint value = (*env)-&gt;GetIntField(env, thisObject, fieldID);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Hello, World 0x%x\n&quot;</span>, value);</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到，在 JNI 中访问字段类似于反射 API：我们首先需要通过类实例获得FieldID，然后再通过FieldID获得某个实例中该字段的值。不过，与 Java 代码相比，上述代码貌似不用处理异常。事实果真如此吗？</p>
+<p>下面我就尝试获取了不存在的字段j，运行结果如下所示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ java org.example.Foo</span><br><span class="line">Hello, World 0x5</span><br><span class="line">Exception <span class="keyword">in</span> thread <span class="string">&quot;main&quot;</span> java.lang.NoSuchFieldError: j</span><br><span class="line"> at org.example.Foo.bar(Native Method)</span><br><span class="line"> at org.example.Foo.main(Foo.java:20)</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到，printf语句照常执行并打印出Hello, World 0x5，但这个数值明显是错误的。当从 C 函数返回至 main 方法时，Java 虚拟机又会抛出NoSuchFieldError异常。</p>
+<p>实际上，当调用 JNI 函数时，Java 虚拟机便已生成异常实例，并缓存在内存中的某个位置。与 Java 编程不一样的是，它并不会显式地跳转至异常处理器或者调用者中，而是继续执行接下来的 C 代码。</p>
+<p>因此，当从可能触发异常的 JNI 函数返回时，我们需要通过 JNI 函数ExceptionOccurred检查是否发生了异常，并且作出相应的处理。如果无须抛出该异常，那么我们需要通过 JNI 函数ExceptionClear显式地清空已缓存的异常。</p>
+<p>具体示例如下所示（为了控制代码篇幅，我仅在第一个GetFieldID后检查异常以及清空异常）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// foo.c</span></span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include <span class="string">&quot;org_example_Foo.h&quot;</span></span><br><span class="line"> </span><br><span class="line">JNIEXPORT <span class="keyword">void</span> JNICALL <span class="title function_">Java_org_example_Foo_bar__Ljava_lang_String_2Ljava_lang_Object_2</span></span><br><span class="line">  <span class="params">(JNIEnv *env, jobject thisObject, jstring str, jobject obj)</span> &#123;</span><br><span class="line">  <span class="type">jclass</span> <span class="variable">cls</span> <span class="operator">=</span> (*env)-&gt;GetObjectClass(env, thisObject);</span><br><span class="line">  <span class="type">jfieldID</span> <span class="variable">fieldID</span> <span class="operator">=</span> (*env)-&gt;GetFieldID(env, cls, <span class="string">&quot;j&quot;</span>, <span class="string">&quot;I&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span>((*env)-&gt;ExceptionOccurred(env)) &#123;</span><br><span class="line">    printf(<span class="string">&quot;Exception!\n&quot;</span>);</span><br><span class="line">    (*env)-&gt;ExceptionClear(env);</span><br><span class="line">  &#125;</span><br><span class="line">  fieldID = (*env)-&gt;GetFieldID(env, cls, <span class="string">&quot;i&quot;</span>, <span class="string">&quot;I&quot;</span>);</span><br><span class="line">  <span class="type">jint</span> <span class="variable">value</span> <span class="operator">=</span> (*env)-&gt;GetIntField(env, thisObject, fieldID);</span><br><span class="line">  <span class="comment">// we should put an exception guard here as well.</span></span><br><span class="line">  printf(<span class="string">&quot;Hello, World 0x%x\n&quot;</span>, value);</span><br><span class="line">  <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="局部引用与全局引用"><a href="#局部引用与全局引用" class="headerlink" title="局部引用与全局引用"></a>局部引用与全局引用</h1><p>在 C 代码中，我们可以访问所传入的引用类型参数，也可以通过 JNI 函数创建新的 Java 对象。</p>
+<p>这些 Java 对象显然也会受到垃圾回收器的影响。因此，Java 虚拟机需要一种机制，来告知垃圾回收算法，不要回收这些 C 代码中可能引用到的 Java 对象。</p>
+<p>这种机制便是 JNI 的局部引用（Local Reference）和全局引用（Global Reference）。垃圾回收算法会将被这两种引用指向的对象标记为不可回收。</p>
+<p>事实上，无论是传入的引用类型参数，还是通过 JNI 函数（除NewGlobalRef及NewWeakGlobalRef之外）返回的引用类型对象，都属于局部引用。</p>
+<p>不过，一旦从 C 函数中返回至 Java 方法之中，那么局部引用将失效。也就是说，垃圾回收器在标记垃圾时不再考虑这些局部引用。</p>
+<p>这就意味着，我们不能缓存局部引用，以供另一 C 线程或下一次 native 方法调用时使用。</p>
+<p>对于这种应用场景，我们需要借助 JNI 函数NewGlobalRef，将该局部引用转换为全局引用，以确保其指向的 Java 对象不会被垃圾回收。</p>
+<p>相应的，我们还可以通过 JNI 函数DeleteGlobalRef来消除全局引用，以便回收被全局引用指向的 Java 对象。</p>
+<p>此外，当 C 函数运行时间极其长时，我们也应该考虑通过 JNI 函数DeleteLocalRef，消除不再使用的局部引用，以便回收被引用的 Java 对象。</p>
+<p>另一方面，由于垃圾回收器可能会移动对象在内存中的位置，因此 Java 虚拟机需要另一种机制，来保证局部引用或者全局引用将正确地指向移动过后的对象。</p>
+<p>HotSpot 虚拟机是通过句柄（handle）来完成上述需求的。这里句柄指的是内存中 Java 对象的指针的指针。当发生垃圾回收时，如果 Java 对象被移动了，那么句柄指向的指针值也将发生变动，但句柄本身保持不变。</p>
+<p>实际上，无论是局部引用还是全局引用，都是句柄。其中，局部引用所对应的句柄有两种存储方式，一是在本地方法栈帧中，主要用于存放 C 函数所接收的来自 Java 层面的引用类型参数；另一种则是线程私有的句柄块，主要用于存放 C 函数运行过程中创建的局部引用。</p>
+<p>当从 C 函数返回至 Java 方法时，本地方法栈帧中的句柄将会被自动清除。而线程私有句柄块则需要由 Java 虚拟机显式清理。</p>
+<p>进入 C 函数时对引用类型参数的句柄化，和调整参数位置（C 调用和 Java 调用传参的方式不一样），以及从 C 函数返回时清理线程私有句柄块，共同造就了 JNI 调用的额外性能开销（具体可参考该 stackoverflow 上的<a href="https://stackoverflow.com/questions/24746776/what-does-a-jvm-have-to-do-when-calling-a-native-method/24747484#24747484">回答</a>）。</p>
+<h1 id="总结与实践"><a href="#总结与实践" class="headerlink" title="总结与实践"></a>总结与实践</h1><p>今天我介绍了 JNI 的运行机制。</p>
+<p>Java 中的 native 方法的链接方式主要有两种。一是按照 JNI 的默认规范命名所要链接的 C 函数，并依赖于 Java 虚拟机自动链接。另一种则是在 C 代码中主动链接。</p>
+<p>JNI 提供了一系列 API 来允许 C 代码使用 Java 语言特性。这些 API 不仅使用了特殊的数据结构来表示 Java 类，还拥有特殊的异常处理模式。</p>
+<p>JNI 中的引用可分为局部引用和全局引用。这两者都可以阻止垃圾回收器回收被引用的 Java 对象。不同的是，局部引用在 native 方法调用返回之后便会失效。传入参数以及大部分 JNI API 函数的返回值都属于局部引用。</p>
+<p>今天的实践环节，请阅读<a href="https://www.ibm.com/developerworks/java/library/j-jni/index.html">该文档</a>中的 Performance pitfalls 以及 Correctness pitfalls 两节。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/23/jvm-31/" rel="prev" title="31 | Java虚拟机的监控及诊断工具（GUI篇）">
+      <i class="fa fa-chevron-left"></i> 31 | Java虚拟机的监控及诊断工具（GUI篇）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/01/23/jvm-33/" rel="next" title="33 | Java Agent与字节码注入">
+      33 | Java Agent与字节码注入 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#native-%E6%96%B9%E6%B3%95%E7%9A%84%E9%93%BE%E6%8E%A5"><span class="nav-number">2.</span> <span class="nav-text">native 方法的链接</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JNI-%E7%9A%84-API"><span class="nav-number">3.</span> <span class="nav-text">JNI 的 API</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E5%BC%95%E7%94%A8%E4%B8%8E%E5%85%A8%E5%B1%80%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">局部引用与全局引用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E5%AE%9E%E8%B7%B5"><span class="nav-number">5.</span> <span class="nav-text">总结与实践</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Sealin</p>
+  <div class="site-description" itemprop="description">不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sealin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.0.0-rc1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.sealin.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="问题centos7安装docker后, 宿主机ping容器地址出现以下错误: 123456[root@fileserver ~]# ping 172.17.78.2PING 172.17.78.2 (172.17.78.2) 56(84) bytes of data.From 172.17.78.1 icmp_seq&#x3D;1 Destination Host UnreachableFrom 172.1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="centos7宿主机无法与docker通信问题解决">
+<meta property="og:url" content="http://www.sealin.net/2020/07/10/docker-unreachable/index.html">
+<meta property="og:site_name" content="Sealin">
+<meta property="og:description" content="问题centos7安装docker后, 宿主机ping容器地址出现以下错误: 123456[root@fileserver ~]# ping 172.17.78.2PING 172.17.78.2 (172.17.78.2) 56(84) bytes of data.From 172.17.78.1 icmp_seq&#x3D;1 Destination Host UnreachableFrom 172.1">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.sealin.net/images/2020/07/10/65a9b4d4-7693-41f1-815f-9af3c88c8bb8.png">
+<meta property="article:published_time" content="2020-07-10T02:14:15.000Z">
+<meta property="article:modified_time" content="2023-05-23T01:43:32.479Z">
+<meta property="article:author" content="Sealin">
+<meta property="article:tag" content="基础服务">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="CentOS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.sealin.net/images/2020/07/10/65a9b4d4-7693-41f1-815f-9af3c88c8bb8.png">
+
+<link rel="canonical" href="http://www.sealin.net/2020/07/10/docker-unreachable/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>centos7宿主机无法与docker通信问题解决 | Sealin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Sealin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sealin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">初闻不解词间意，再听已是曲中人。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/07/10/docker-unreachable/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Sealin">
+      <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sealin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          centos7宿主机无法与docker通信问题解决
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-10 10:14:15" itemprop="dateCreated datePublished" datetime="2020-07-10T10:14:15+08:00">2020-07-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-23 09:43:32" itemprop="dateModified" datetime="2023-05-23T09:43:32+08:00">2023-05-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">环境配置</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>centos7安装docker后, 宿主机ping容器地址出现以下错误:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@fileserver ~]<span class="comment"># ping 172.17.78.2</span></span><br><span class="line">PING 172.17.78.2 (172.17.78.2) 56(84) bytes of data.</span><br><span class="line">From 172.17.78.1 icmp_seq=1 Destination Host Unreachable</span><br><span class="line">From 172.17.78.1 icmp_seq=2 Destination Host Unreachable</span><br><span class="line">From 172.17.78.1 icmp_seq=3 Destination Host Unreachable</span><br><span class="line">From 172.17.78.1 icmp_seq=4 Destination Host Unreachable</span><br></pre></td></tr></table></figure>
+<p><img src="/images/2020/07/10/65a9b4d4-7693-41f1-815f-9af3c88c8bb8.png" alt="image.png"></p>
+<h1 id="解决方案1"><a href="#解决方案1" class="headerlink" title="解决方案1"></a>解决方案1</h1><p>关闭防火墙</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ sudo systemctl stop iptables</span><br><span class="line">$ sudo systemctl <span class="built_in">disable</span> iptables</span><br><span class="line">$ sudo systemctl stop firewalld</span><br><span class="line">$ sudo systemctl <span class="built_in">disable</span> firewalld</span><br></pre></td></tr></table></figure>
+<p>关闭selinux</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># vi /etc/selinux/config</span></span><br></pre></td></tr></table></figure>
+<p>将 <strong>SELINUX&#x3D;enforcing</strong> 改为 <strong>SELINUX&#x3D;disabled</strong></p>
+<p>当然也可以根据实际需要添加防火墙规则, 不过要是通过docker-compose启动容器,可能会创建docker0之外的网卡,要再次添加规则,比较麻烦.</p>
+<h1 id="解决方案2"><a href="#解决方案2" class="headerlink" title="解决方案2"></a>解决方案2</h1><p>启动时使用主机网络, 启动时加上–net&#x3D;host</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d --name <span class="built_in">test</span> --net=host image:1.0</span><br></pre></td></tr></table></figure>
+<p>这个方案的弊端比较明显, 容器需要开放的端口不能指定, 会直接启动到宿主机的端口上, 要是有其他服务在用这个端口就启动不了容器了.</p>
+<h1 id="解决方案3"><a href="#解决方案3" class="headerlink" title="解决方案3"></a>解决方案3</h1><p>如果已经确认防火墙关闭了, 不能访问容器也不想使用主机网络模式,可以升级内核试试.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 查看当前内核版本</span></span><br><span class="line"><span class="comment"># uname -r</span></span><br><span class="line">3.10.0-327.el7.x86_64</span><br><span class="line"><span class="comment">## 导入内核源</span></span><br><span class="line"><span class="comment"># rpm -import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org</span></span><br><span class="line"><span class="comment"># rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm</span></span><br><span class="line"><span class="comment"># yum --enablerepo=elrepo-kernel install -y kernel-ml</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 安装完后, 查看内核列表</span></span><br><span class="line"><span class="comment"># cat /boot/grub2/grub.cfg |grep menuentry</span></span><br><span class="line">menuentry <span class="string">&#x27;CentOS Linux (5.7.8-1.el7.elrepo.x86_64) 7 (Core)&#x27;</span> --class centos --class gnu-linux --class gnu --class os --unrestricted <span class="variable">$menuentry_id_option</span> <span class="string">&#x27;gnulinux-3.10.0-327.el7.x86_64-advanced-3bfef048-3886-4956-9ec3-7bdbfa7f6726&#x27;</span> &#123;</span><br><span class="line">menuentry <span class="string">&#x27;CentOS Linux (3.10.0-327.el7.x86_64) 7 (Core)&#x27;</span> --class centos --class gnu-linux --class gnu --class os --unrestricted <span class="variable">$menuentry_id_option</span> <span class="string">&#x27;gnulinux-3.10.0-327.el7.x86_64-advanced-3bfef048-3886-4956-9ec3-7bdbfa7f6726&#x27;</span> &#123;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="comment">## 设置默认启动高版本内核, 注意替换版本为上面查询得到的版本号</span></span><br><span class="line"><span class="comment"># grub2-set-default &#x27;CentOS Linux (5.7.8-1.el7.elrepo.x86_64) 7 (Core)&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 重启</span></span><br><span class="line"><span class="comment"># reboot</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 再次查看版本</span></span><br><span class="line"><span class="comment"># uname -r</span></span><br><span class="line">5.7.8-1.el7.elrepo.x86_64</span><br></pre></td></tr></table></figure>
+
+<p>再ping容器试试, 要是依然无法解决此问题, 关键时刻别忘了运维三法宝:</p>
+<h2 id="重启"><a href="#重启" class="headerlink" title="重启"></a>重启</h2><h2 id="重装"><a href="#重装" class="headerlink" title="重装"></a>重装</h2><h2 id="换电脑"><a href="#换电脑" class="headerlink" title="换电脑"></a>换电脑</h2><p>再见~</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1/" rel="tag"># 基础服务</a>
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+              <a href="/tags/CentOS/" rel="tag"># CentOS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/28/mac-iterm-power/" rel="prev" title="Mac下iTerm2使用电池时滚动不连贯">
+      <i class="fa fa-chevron-left"></i> Mac下iTerm2使用电池时滚动不连贯
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/13/docker-route/" rel="next" title="Docker多宿主机通信">
+      Docker多宿主机通信 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%881"><span class="nav-number">2.</span> <span class="nav-text">解决方案1</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%882"><span class="nav-number">3.</span> <span class="nav-text">解决方案2</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%883"><span class="nav-number">4.</span> <span class="nav-text">解决方案3</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%90%AF"><span class="nav-number">4.1.</span> <span class="nav-text">重启</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E8%A3%85"><span class="nav-number">4.2.</span> <span class="nav-text">重装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8D%A2%E7%94%B5%E8%84%91"><span class="nav-number">4.3.</span> <span class="nav-text">换电脑</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Sealin</p>
+  <div class="site-description" itemprop="description">不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sealin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

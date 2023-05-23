@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.0.0-rc1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.sealin.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="var ap &#x3D; new APlayer({             element: document.getElementById(&quot;aplayer-JsshwQgr&quot;),             narrow: false,             autoplay: false,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="27 | 注解处理器">
+<meta property="og:url" content="http://www.sealin.net/2020/01/23/jvm-27/index.html">
+<meta property="og:site_name" content="Sealin">
+<meta property="og:description" content="var ap &#x3D; new APlayer({             element: document.getElementById(&quot;aplayer-JsshwQgr&quot;),             narrow: false,             autoplay: false,">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.sealin.net/images/2020/01/23/633ce240-3db9-11ea-87eb-3d1d349c50f2.png">
+<meta property="article:published_time" content="2020-01-23T08:27:34.000Z">
+<meta property="article:modified_time" content="2023-05-23T01:43:32.488Z">
+<meta property="article:author" content="Sealin">
+<meta property="article:tag" content="JAVA">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.sealin.net/images/2020/01/23/633ce240-3db9-11ea-87eb-3d1d349c50f2.png">
+
+<link rel="canonical" href="http://www.sealin.net/2020/01/23/jvm-27/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>27 | 注解处理器 | Sealin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Sealin" type="application/atom+xml">
+<link rel="stylesheet" href="/assets/css/APlayer.min.css" class="aplayer-style-marker">
+<script src="/assets/js/APlayer.min.js" class="aplayer-script-marker"></script>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sealin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">初闻不解词间意，再听已是曲中人。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/23/jvm-27/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Sealin">
+      <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sealin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          27 | 注解处理器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-23 16:27:34" itemprop="dateCreated datePublished" datetime="2020-01-23T16:27:34+08:00">2020-01-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-23 09:43:32" itemprop="dateModified" datetime="2023-05-23T09:43:32+08:00">2023-05-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%98%85%E8%AF%BB/" itemprop="url" rel="index"><span itemprop="name">阅读</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%98%85%E8%AF%BB/%E6%B7%B1%E5%85%A5%E6%8B%86%E8%A7%A3-Java-%E8%99%9A%E6%8B%9F%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">深入拆解 Java 虚拟机</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        
+        <div id="aplayer-JsshwQgr" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+            <pre class="aplayer-lrc-content"></pre>
+        </div>
+        <script>
+          var ap = new APlayer({
+            element: document.getElementById("aplayer-JsshwQgr"),
+            narrow: false,
+            autoplay: false,
+            showlrc: false,
+            music: {
+              title: "音频27",
+              author: "郑雨迪",
+              url: "https://res001.geekbang.org/resource/audio/8c/3d/8c26bebd8e5fa781cebcfe90ebfd943d.mp3",
+              pic: "",
+              lrc: ""
+            }
+          });
+          window.aplayers || (window.aplayers = []);
+          window.aplayers.push(ap);
+        </script>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>注解（annotation）是 Java 5 引入的，用来为类、方法、字段、参数等 Java 结构提供额外信息的机制。我先举个例子，比如，Java 核心类库中的@Override注解是被用来声明某个实例方法重写了父类的同名同参数类型的方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java.lang;</span><br><span class="line"> </span><br><span class="line"><span class="meta">@Target(ElementType.METHOD)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.SOURCE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Override &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>@Override注解本身被另外两个元注解（即作用在注解上的注解）所标注。其中，@Target用来限定目标注解所能标注的 Java 结构，这里@Override便只能被用来标注方法。</p>
+<p>@Retention则用来限定当前注解生命周期。注解共有三种不同的生命周期：SOURCE，CLASS或RUNTIME，分别表示注解只出现在源代码中，只出现在源代码和字节码中，以及出现在源代码、字节码和运行过程中。</p>
+<p>这里@Override便只能出现在源代码中。一旦标注了@Override的方法所在的源代码被编译为字节码，该注解便会被擦除。</p>
+<p>我们不难猜到，@Override仅对 Java 编译器有用。事实上，它会为 Java 编译器引入了一条新的编译规则，即如果所标注的方法不是 Java 语言中的重写方法，那么编译器会报错。而当编译完成时，它的使命也就结束了。</p>
+<p>我们知道，Java 的注解机制允许开发人员自定义注解。这些自定义注解同样可以为 Java 编译器添加编译规则。不过，这种功能需要由开发人员提供，并且以插件的形式接入 Java 编译器中，这些插件我们称之为注解处理器（annotation processor）。</p>
+<p>除了引入新的编译规则之外，注解处理器还可以用于修改已有的 Java 源文件（不推荐），或者生成新的 Java 源文件。下面，我将用几个案例来详细阐述注解处理器的这些功能，以及它背后的原理。</p>
+<h1 id="注解处理器的原理"><a href="#注解处理器的原理" class="headerlink" title="注解处理器的原理"></a>注解处理器的原理</h1><p>在介绍注解处理器之前，我们先来了解一下 Java 编译器的工作流程。</p>
+<p><img src="/images/2020/01/23/633ce240-3db9-11ea-87eb-3d1d349c50f2.png" alt="image.png"></p>
+<p>如上图所示 出处 [1]，Java 源代码的编译过程可分为三个步骤：</p>
+<ol>
+<li>将源文件解析为抽象语法树；</li>
+<li>调用已注册的注解处理器；</li>
+<li>生成字节码。</li>
+</ol>
+<p>如果在第 2 步调用注解处理器过程中生成了新的源文件，那么编译器将重复第 1、2 步，解析并且处理新生成的源文件。每次重复我们称之为一轮（Round）。</p>
+<p>也就是说，第一轮解析、处理的是输入至编译器中的已有源文件。如果注解处理器生成了新的源文件，则开始第二轮、第三轮，解析并且处理这些新生成的源文件。当注解处理器不再生成新的源文件，编译进入最后一轮，并最终进入生成字节码的第 3 步。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> foo;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.*;</span><br><span class="line"> </span><br><span class="line"><span class="meta">@Target(&#123; ElementType.TYPE, ElementType.FIELD &#125;)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.SOURCE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> CheckGetter &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面这段代码中，我定义了一个注解@CheckGetter。它既可以用来标注类，也可以用来标注字段。此外，它和@Override相同，其生命周期被限定在源代码中。</p>
+<p>下面我们来实现一个处理@CheckGetter注解的处理器。它将遍历被标注的类中的实例字段，并检查有没有相应的getter方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Processor</span> &#123;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">init</span><span class="params">(ProcessingEnvironment processingEnv)</span>;</span><br><span class="line">  </span><br><span class="line">  Set&lt;String&gt; <span class="title function_">getSupportedAnnotationTypes</span><span class="params">()</span>;</span><br><span class="line">  </span><br><span class="line">  SourceVersion <span class="title function_">getSupportedSourceVersion</span><span class="params">()</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="type">boolean</span> <span class="title function_">process</span><span class="params">(Set&lt;? extends TypeElement&gt; annotations, RoundEnvironment roundEnv)</span>;</span><br><span class="line">  </span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所有的注解处理器类都需要实现接口Processor。该接口主要有四个重要方法。其中，init方法用来存放注解处理器的初始化代码。之所以不用构造器，是因为在 Java 编译器中，注解处理器的实例是通过反射 API 生成的。也正是因为使用反射 API，每个注解处理器类都需要定义一个无参数构造器。</p>
+<p>通常来说，当编写注解处理器时，我们不声明任何构造器，并依赖于 Java 编译器，为之插入一个无参数构造器。而具体的初始化代码，则放入init方法之中。</p>
+<p>在剩下的三个方法中，getSupportedAnnotationTypes方法将返回注解处理器所支持的注解类型，这些注解类型只需用字符串形式表示即可。</p>
+<p>getSupportedSourceVersion方法将返回该处理器所支持的 Java 版本，通常，这个版本需要与你的 Java 编译器版本保持一致；而process方法则是最为关键的注解处理方法。</p>
+<p>JDK 提供了一个实现Processor接口的抽象类AbstractProcessor。该抽象类实现了init、getSupportedAnnotationTypes和getSupportedSourceVersion方法。</p>
+<p>它的子类可以通过@SupportedAnnotationTypes和@SupportedSourceVersion注解来声明所支持的注解类型以及 Java 版本。</p>
+<p>下面这段代码便是@CheckGetter注解处理器的实现。由于我使用了 Java 10 的编译器，因此将支持版本设置为SourceVersion.RELEASE_10。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> bar;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> javax.annotation.processing.*;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.SourceVersion;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.element.*;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.util.ElementFilter;</span><br><span class="line"><span class="keyword">import</span> javax.tools.Diagnostic.Kind;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> foo.CheckGetter;</span><br><span class="line"> </span><br><span class="line"><span class="meta">@SupportedAnnotationTypes(&quot;foo.CheckGetter&quot;)</span></span><br><span class="line"><span class="meta">@SupportedSourceVersion(SourceVersion.RELEASE_10)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CheckGetterProcessor</span> <span class="keyword">extends</span> <span class="title class_">AbstractProcessor</span> &#123;</span><br><span class="line"> </span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">process</span><span class="params">(Set&lt;? extends TypeElement&gt; annotations, RoundEnvironment roundEnv)</span> &#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> annotated ElementKind.FIELD</span></span><br><span class="line">    <span class="keyword">for</span> (TypeElement annotatedClass : ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(CheckGetter.class))) &#123;</span><br><span class="line">      <span class="keyword">for</span> (VariableElement field : ElementFilter.fieldsIn(annotatedClass.getEnclosedElements())) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!containsGetter(annotatedClass, field.getSimpleName().toString())) &#123;</span><br><span class="line">          processingEnv.getMessager().printMessage(Kind.ERROR,</span><br><span class="line">              String.format(<span class="string">&quot;getter not found for &#x27;%s.%s&#x27;.&quot;</span>, annotatedClass.getSimpleName(), field.getSimpleName()));</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">containsGetter</span><span class="params">(TypeElement typeElement, String name)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">getter</span> <span class="operator">=</span> <span class="string">&quot;get&quot;</span> + name.substring(<span class="number">0</span>, <span class="number">1</span>).toUpperCase() + name.substring(<span class="number">1</span>).toLowerCase();</span><br><span class="line">    <span class="keyword">for</span> (ExecutableElement executableElement : ElementFilter.methodsIn(typeElement.getEnclosedElements())) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!executableElement.getModifiers().contains(Modifier.STATIC)</span><br><span class="line">          &amp;&amp; executableElement.getSimpleName().toString().equals(getter)</span><br><span class="line">          &amp;&amp; executableElement.getParameters().isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该注解处理器仅重写了process方法。这个方法将接收两个参数，分别代表该注解处理器所能处理的注解类型，以及囊括当前轮生成的抽象语法树的RoundEnvironment。</p>
+<p>由于该处理器针对的注解仅有@CheckGetter一个，而且我们并不会读取注解中的值，因此第一个参数并不重要。在代码中，我直接使用了</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">`roundEnv.getElementsAnnotatedWith(CheckGetter.class)`</span><br></pre></td></tr></table></figure>
+
+<p>来获取所有被@CheckGetter注解的类（以及字段）。</p>
+<p>process方法涉及各种不同类型的Element，分别指代 Java 程序中的各个结构。如TypeElement指代类或者接口，VariableElement指代字段、局部变量、enum 常量等，ExecutableElement指代方法或者构造器。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> foo;     <span class="comment">// PackageElement</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Foo</span> &#123;      <span class="comment">// TypeElement</span></span><br><span class="line">  <span class="type">int</span> a;           <span class="comment">// VariableElement</span></span><br><span class="line">  <span class="keyword">static</span> <span class="type">int</span> b;    <span class="comment">// VariableElement</span></span><br><span class="line">  Foo () &#123;&#125;        <span class="comment">// ExecutableElement</span></span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">setA</span> <span class="params">(      // ExecutableElement</span></span><br><span class="line"><span class="params">    <span class="type">int</span> newA         // VariableElement</span></span><br><span class="line"><span class="params">  )</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这些结构之间也有从属关系，如上面这段代码所示 (出处 [2]）。我们可以通过TypeElement.getEnclosedElements方法，获得上面这段代码中Foo类的字段、构造器以及方法。</p>
+<p>我们也可以通过ExecutableElement.getParameters方法，获得setA方法的参数。具体这些Element类都有哪些 API，你可以参考它们的 Javadoc[3]。</p>
+<p>在将该注解处理器编译成 class 文件后，我们便可以将其注册为 Java 编译器的插件，并用来处理其他源代码。注册的方法主要有两种。第一种是直接使用 javac 命令的-processor参数，如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ javac -cp /CLASSPATH/TO/CheckGetterProcessor -processor bar.CheckGetterProcessor Foo.java</span><br><span class="line">error: Class <span class="string">&#x27;Foo&#x27;</span> is annotated as <span class="meta">@CheckGetter</span>, but field <span class="string">&#x27;a&#x27;</span> is without getter</span><br><span class="line"><span class="number">1</span> error</span><br></pre></td></tr></table></figure>
+
+<p>第二种则是将注解处理器编译生成的 class 文件压缩入 jar 包中，并在 jar 包的配置文件中记录该注解处理器的包名及类名，即bar.CheckGetterProcessor。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">（具体路径及配置文件名为`META-INF/services/javax.annotation.processing.Processor`）</span><br></pre></td></tr></table></figure>
+
+<p>当启动 Java 编译器时，它会寻找 classpath 路径上的 jar 包是否包含上述配置文件，并自动注册其中记录的注解处理器。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ javac -cp /PATH/TO/CheckGetterProcessor.jar Foo.java</span><br><span class="line">error: Class <span class="string">&#x27;Foo&#x27;</span> is annotated as <span class="meta">@CheckGetter</span>, but field <span class="string">&#x27;a&#x27;</span> is without getter</span><br><span class="line"><span class="number">1</span> error</span><br></pre></td></tr></table></figure>
+
+<p>此外，我们还可以在 IDE 中配置注解处理器。这里我就不过多演示了，感兴趣的同学可以自行搜索。</p>
+<h1 id="利用注解处理器生成源代码"><a href="#利用注解处理器生成源代码" class="headerlink" title="利用注解处理器生成源代码"></a>利用注解处理器生成源代码</h1><p>前面提到，注解处理器可以用来修改已有源代码或者生成源代码。</p>
+<p>确切地说，注解处理器并不能真正地修改已有源代码。这里指的是修改由 Java 源代码生成的抽象语法树，在其中修改已有树节点或者插入新的树节点，从而使生成的字节码发生变化。</p>
+<p>对抽象语法树的修改涉及了 Java 编译器的内部 API，这部分很可能随着版本变更而失效。因此，我并不推荐这种修改方式。</p>
+<p>如果你感兴趣的话，可以参考 [Project Lombok][4]。这个项目自定义了一系列注解，并根据注解的内容来修改已有的源代码。例如它提供了@Getter和@Setter注解，能够为程序自动添加getter以及setter方法。有关对使用内部 API 的讨论，你可以参考 [这篇博客][5]，以及 [Lombok 的回应][6]。</p>
+<p>用注解处理器来生成源代码则比较常用。我们以前介绍过的压力测试 jcstress，以及接下来即将介绍的 JMH 工具，都是依赖这种方式来生成测试代码的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> foo;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.*;</span><br><span class="line"> </span><br><span class="line"><span class="meta">@Target(ElementType.METHOD)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.SOURCE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Adapt &#123;</span><br><span class="line">  Class&lt;?&gt; value();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面这段代码中，我定义了一个注解@Adapt。这个注解将接收一个Class类型的参数value（如果注解类仅包含一个名为value的参数时，那么在使用注解时，我们可以省略value&#x3D;），具体用法如这段代码所示。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Bar.java</span></span><br><span class="line"><span class="keyword">package</span> test;</span><br><span class="line"><span class="keyword">import</span> java.util.function.IntBinaryOperator;</span><br><span class="line"><span class="keyword">import</span> foo.Adapt;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Bar</span> &#123;</span><br><span class="line">  <span class="meta">@Adapt(IntBinaryOperator.class)</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，我们来实现一个处理@Adapt注解的处理器。该处理器将生成一个新的源文件，实现参数value所指定的接口，并且调用至被该注解所标注的方法之中。具体的实现代码比较长，建议你在<a href="https://time.geekbang.org/column/108">网页端</a>观看。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> bar;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> javax.annotation.processing.*;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.SourceVersion;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.element.*;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.type.TypeMirror;</span><br><span class="line"><span class="keyword">import</span> javax.lang.model.util.ElementFilter;</span><br><span class="line"><span class="keyword">import</span> javax.tools.JavaFileObject;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> javax.tools.Diagnostic.Kind;</span><br><span class="line"> </span><br><span class="line"><span class="meta">@SupportedAnnotationTypes(&quot;foo.Adapt&quot;)</span></span><br><span class="line"><span class="meta">@SupportedSourceVersion(SourceVersion.RELEASE_10)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AdaptProcessor</span> <span class="keyword">extends</span> <span class="title class_">AbstractProcessor</span> &#123;</span><br><span class="line"> </span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">process</span><span class="params">(Set&lt;? extends TypeElement&gt; annotations, RoundEnvironment roundEnv)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (TypeElement annotation : annotations) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!<span class="string">&quot;foo.Adapt&quot;</span>.equals(annotation.getQualifiedName().toString())) &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line"> </span><br><span class="line">      <span class="type">ExecutableElement</span> <span class="variable">targetAsKey</span> <span class="operator">=</span> getExecutable(annotation, <span class="string">&quot;value&quot;</span>);</span><br><span class="line"> </span><br><span class="line">      <span class="keyword">for</span> (ExecutableElement annotatedMethod : ElementFilter.methodsIn(roundEnv.getElementsAnnotatedWith(annotation))) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!annotatedMethod.getModifiers().contains(Modifier.PUBLIC)) &#123;</span><br><span class="line">          processingEnv.getMessager().printMessage(Kind.ERROR, <span class="string">&quot;@Adapt on non-public method&quot;</span>);</span><br><span class="line">          <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!annotatedMethod.getModifiers().contains(Modifier.STATIC)) &#123;</span><br><span class="line">          <span class="comment">// TODO support non-static methods</span></span><br><span class="line">          <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="type">TypeElement</span> <span class="variable">targetInterface</span> <span class="operator">=</span> getAnnotationValueAsTypeElement(annotatedMethod, annotation, targetAsKey);</span><br><span class="line">        <span class="keyword">if</span> (targetInterface.getKind() != ElementKind.INTERFACE) &#123;</span><br><span class="line">          processingEnv.getMessager().printMessage(Kind.ERROR, <span class="string">&quot;@Adapt with non-interface input&quot;</span>);</span><br><span class="line">          <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="type">TypeElement</span> <span class="variable">enclosingType</span> <span class="operator">=</span> getTopLevelEnclosingType(annotatedMethod);</span><br><span class="line">        createAdapter(enclosingType, annotatedMethod, targetInterface);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">createAdapter</span><span class="params">(TypeElement enclosingClass, ExecutableElement annotatedMethod,</span></span><br><span class="line"><span class="params">      TypeElement targetInterface)</span> &#123;</span><br><span class="line">    <span class="type">PackageElement</span> <span class="variable">packageElement</span> <span class="operator">=</span> (PackageElement) enclosingClass.getEnclosingElement();</span><br><span class="line">    <span class="type">String</span> <span class="variable">packageName</span> <span class="operator">=</span> packageElement.getQualifiedName().toString();</span><br><span class="line">    <span class="type">String</span> <span class="variable">className</span> <span class="operator">=</span> enclosingClass.getSimpleName().toString();</span><br><span class="line">    <span class="type">String</span> <span class="variable">methodName</span> <span class="operator">=</span> annotatedMethod.getSimpleName().toString();</span><br><span class="line">    <span class="type">String</span> <span class="variable">adapterName</span> <span class="operator">=</span> className + <span class="string">&quot;_&quot;</span> + methodName + <span class="string">&quot;Adapter&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="type">ExecutableElement</span> <span class="variable">overriddenMethod</span> <span class="operator">=</span> getFirstNonDefaultExecutable(targetInterface);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="type">Filer</span> <span class="variable">filer</span> <span class="operator">=</span> processingEnv.getFiler();</span><br><span class="line">      <span class="type">JavaFileObject</span> <span class="variable">sourceFile</span> <span class="operator">=</span> filer.createSourceFile(packageName + <span class="string">&quot;.&quot;</span> + adapterName, <span class="keyword">new</span> <span class="title class_">Element</span>[<span class="number">0</span>]);</span><br><span class="line"> </span><br><span class="line">      <span class="keyword">try</span> (<span class="type">PrintWriter</span> <span class="variable">out</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PrintWriter</span>(sourceFile.openWriter())) &#123;</span><br><span class="line">        out.println(<span class="string">&quot;package &quot;</span> + packageName + <span class="string">&quot;;&quot;</span>);</span><br><span class="line">        out.println(<span class="string">&quot;import &quot;</span> + targetInterface.getQualifiedName() + <span class="string">&quot;;&quot;</span>);</span><br><span class="line">        out.println();</span><br><span class="line">        out.println(<span class="string">&quot;public class &quot;</span> + adapterName + <span class="string">&quot; implements &quot;</span> + targetInterface.getSimpleName() + <span class="string">&quot; &#123;&quot;</span>);</span><br><span class="line">        out.println(<span class="string">&quot;  @Override&quot;</span>);</span><br><span class="line">        out.println(<span class="string">&quot;  public &quot;</span> + overriddenMethod.getReturnType() + <span class="string">&quot; &quot;</span> + overriddenMethod.getSimpleName()</span><br><span class="line">            + formatParameter(overriddenMethod, <span class="literal">true</span>) + <span class="string">&quot; &#123;&quot;</span>);</span><br><span class="line">        out.println(<span class="string">&quot;    return &quot;</span> + className + <span class="string">&quot;.&quot;</span> + methodName + formatParameter(overriddenMethod, <span class="literal">false</span>) + <span class="string">&quot;;&quot;</span>);</span><br><span class="line">        out.println(<span class="string">&quot;  &#125;&quot;</span>);</span><br><span class="line">        out.println(<span class="string">&quot;&#125;&quot;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">private</span> ExecutableElement <span class="title function_">getExecutable</span><span class="params">(TypeElement annotation, String methodName)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (ExecutableElement method : ElementFilter.methodsIn(annotation.getEnclosedElements())) &#123;</span><br><span class="line">      <span class="keyword">if</span> (methodName.equals(method.getSimpleName().toString())) &#123;</span><br><span class="line">        <span class="keyword">return</span> method;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    processingEnv.getMessager().printMessage(Kind.ERROR, <span class="string">&quot;Incompatible @Adapt.&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">private</span> ExecutableElement <span class="title function_">getFirstNonDefaultExecutable</span><span class="params">(TypeElement annotation)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (ExecutableElement method : ElementFilter.methodsIn(annotation.getEnclosedElements())) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!method.isDefault()) &#123;</span><br><span class="line">        <span class="keyword">return</span> method;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    processingEnv.getMessager().printMessage(Kind.ERROR,</span><br><span class="line">        <span class="string">&quot;Target interface should declare at least one non-default method.&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">private</span> TypeElement <span class="title function_">getAnnotationValueAsTypeElement</span><span class="params">(ExecutableElement annotatedMethod, TypeElement annotation,</span></span><br><span class="line"><span class="params">      ExecutableElement annotationFunction)</span> &#123;</span><br><span class="line">    <span class="type">TypeMirror</span> <span class="variable">annotationType</span> <span class="operator">=</span> annotation.asType();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">for</span> (AnnotationMirror annotationMirror : annotatedMethod.getAnnotationMirrors()) &#123;</span><br><span class="line">      <span class="keyword">if</span> (processingEnv.getTypeUtils().isSameType(annotationMirror.getAnnotationType(), annotationType)) &#123;</span><br><span class="line">        <span class="type">AnnotationValue</span> <span class="variable">value</span> <span class="operator">=</span> annotationMirror.getElementValues().get(annotationFunction);</span><br><span class="line">        <span class="keyword">if</span> (value == <span class="literal">null</span>) &#123;</span><br><span class="line">          processingEnv.getMessager().printMessage(Kind.ERROR, <span class="string">&quot;Unknown @Adapt target&quot;</span>);</span><br><span class="line">          <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">TypeMirror</span> <span class="variable">targetInterfaceTypeMirror</span> <span class="operator">=</span> (TypeMirror) value.getValue();</span><br><span class="line">        <span class="keyword">return</span> (TypeElement) processingEnv.getTypeUtils().asElement(targetInterfaceTypeMirror);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    processingEnv.getMessager().printMessage(Kind.ERROR, <span class="string">&quot;@Adapt should contain target()&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">private</span> TypeElement <span class="title function_">getTopLevelEnclosingType</span><span class="params">(ExecutableElement annotatedMethod)</span> &#123;</span><br><span class="line">    <span class="type">TypeElement</span> <span class="variable">enclosingType</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">Element</span> <span class="variable">enclosing</span> <span class="operator">=</span> annotatedMethod.getEnclosingElement();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">while</span> (enclosing != <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (enclosing.getKind() == ElementKind.CLASS) &#123;</span><br><span class="line">        enclosingType = (TypeElement) enclosing;</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (enclosing.getKind() == ElementKind.PACKAGE) &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      enclosing = enclosing.getEnclosingElement();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> enclosingType;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">private</span> String <span class="title function_">formatParameter</span><span class="params">(ExecutableElement method, <span class="type">boolean</span> includeType)</span> &#123;</span><br><span class="line">    <span class="type">StringBuilder</span> <span class="variable">builder</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">    builder.append(<span class="string">&#x27;(&#x27;</span>);</span><br><span class="line">    <span class="type">String</span> <span class="variable">separator</span> <span class="operator">=</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">for</span> (VariableElement parameter : method.getParameters()) &#123;</span><br><span class="line">      builder.append(separator);</span><br><span class="line">      <span class="keyword">if</span> (includeType) &#123;</span><br><span class="line">        builder.append(parameter.asType());</span><br><span class="line">        builder.append(<span class="string">&#x27; &#x27;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      builder.append(parameter.getSimpleName());</span><br><span class="line">      separator = <span class="string">&quot;, &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    builder.append(<span class="string">&#x27;)&#x27;</span>);</span><br><span class="line">    <span class="keyword">return</span> builder.toString();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个注解处理器实现中，我们将读取注解中的值，因此我将使用process方法的第一个参数，并通过它获得被标注方法对应的@Adapt注解中的value值。</p>
+<p>之所以采用这种麻烦的方式，是因为value值属于Class类型。在编译过程中，被编译代码中的Class常量未必被加载进 Java 编译器所在的虚拟机中。因此，我们需要通过process方法的第一个参数，获得value所指向的接口的抽象语法树，并据此生成源代码。</p>
+<p>生成源代码的方式实际上非常容易理解。我们可以通过Filer.createSourceFile方法获得一个类似于文件的概念，并通过PrintWriter将具体的内容一一写入即可。</p>
+<p>当将该注解处理器作为插件接入 Java 编译器时，编译前面的test&#x2F;Bar.java将生成下述代码，并且触发新一轮的编译。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;</span><br><span class="line"><span class="keyword">import</span> java.util.function.IntBinaryOperator;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Bar_addAdapter</span> <span class="keyword">implements</span> <span class="title class_">IntBinaryOperator</span> &#123;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">applyAsInt</span><span class="params">(<span class="type">int</span> arg0, <span class="type">int</span> arg1)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> Bar.add(arg0, arg1);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意，该注解处理器没有处理所编译的代码包名为空的情况。</p>
+</blockquote>
+<h1 id="总结与实践"><a href="#总结与实践" class="headerlink" title="总结与实践"></a>总结与实践</h1><p>今天我介绍了 Java 编译器的注解处理器。</p>
+<p>注解处理器主要有三个用途。一是定义编译规则，并检查被编译的源文件。二是修改已有源代码。三是生成新的源代码。其中，第二种涉及了 Java 编译器的内部 API，因此并不推荐。第三种较为常见，是 OpenJDK 工具 jcstress，以及 JMH 生成测试代码的方式。</p>
+<p>Java 源代码的编译过程可分为三个步骤，分别为解析源文件生成抽象语法树，调用已注册的注解处理器，和生成字节码。如果在第 2 步中，注解处理器生成了新的源代码，那么 Java 编译器将重复第 1、2 步，直至不再生成新的源代码。</p>
+<p>今天的实践环节，请实现本文的案例CheckGetterProcessor中的 TODO 项，处理由@CheckGetter注解的字段。</p>
+<p>[1] <a href="http://openjdk.java.net/groups/compiler/doc/compilation-overview/index.html">http://openjdk.java.net/groups/compiler/doc/compilation-overview/index.html</a><br>[2] <a href="http://hannesdorfmann.com/annotation-processing/annotationprocessing101">http://hannesdorfmann.com/annotation-processing/annotationprocessing101</a><br>[3] <a href="https://docs.oracle.com/javase/10/docs/api/javax/lang/model/element/package-summary.html">https://docs.oracle.com/javase/10/docs/api/javax/lang/model/element/package-summary.html</a><br>[4] <a href="https://projectlombok.org/">https://projectlombok.org/</a><br>[5] <a href="http://notatube.blogspot.com/2010/11/project-lombok-trick-explained.html">http://notatube.blogspot.com/2010/11/project-lombok-trick-explained.html</a><br>[6] <a href="http://jnb.ociweb.com/jnb/jnbJan2010.html#controversy">http://jnb.ociweb.com/jnb/jnbJan2010.html#controversy</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/23/jvm-26/" rel="prev" title="26 | 向量化">
+      <i class="fa fa-chevron-left"></i> 26 | 向量化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/01/23/jvm-28/" rel="next" title="28 | 基准测试框架JMH（上）">
+      28 | 基准测试框架JMH（上） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B3%A8%E8%A7%A3%E5%A4%84%E7%90%86%E5%99%A8%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">注解处理器的原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E6%B3%A8%E8%A7%A3%E5%A4%84%E7%90%86%E5%99%A8%E7%94%9F%E6%88%90%E6%BA%90%E4%BB%A3%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">利用注解处理器生成源代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E5%AE%9E%E8%B7%B5"><span class="nav-number">4.</span> <span class="nav-text">总结与实践</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Sealin</p>
+  <div class="site-description" itemprop="description">不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sealin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

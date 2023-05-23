@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.0.0-rc1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.sealin.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1.Redis安装和配置1234567891011121314151617181920212223# 先安装编译环境yum groupinstall &quot;Development tools&quot;cd &#x2F;home&#x2F;packages# 下载rediscurl -O http:&#x2F;&#x2F;download.redis.io&#x2F;releases&#x2F;redis-5.0.0.tar.gz# 解压tar -z">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis集群搭建完整攻略">
+<meta property="og:url" content="http://www.sealin.net/2019/07/02/redis-cluster/index.html">
+<meta property="og:site_name" content="Sealin">
+<meta property="og:description" content="1.Redis安装和配置1234567891011121314151617181920212223# 先安装编译环境yum groupinstall &quot;Development tools&quot;cd &#x2F;home&#x2F;packages# 下载rediscurl -O http:&#x2F;&#x2F;download.redis.io&#x2F;releases&#x2F;redis-5.0.0.tar.gz# 解压tar -z">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-07-02T02:00:34.000Z">
+<meta property="article:modified_time" content="2023-05-23T01:43:32.496Z">
+<meta property="article:author" content="Sealin">
+<meta property="article:tag" content="基础服务">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="缓存">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://www.sealin.net/2019/07/02/redis-cluster/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Redis集群搭建完整攻略 | Sealin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Sealin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sealin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">初闻不解词间意，再听已是曲中人。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2019/07/02/redis-cluster/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Sealin">
+      <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sealin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis集群搭建完整攻略
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-07-02 10:00:34" itemprop="dateCreated datePublished" datetime="2019-07-02T10:00:34+08:00">2019-07-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-23 09:43:32" itemprop="dateModified" datetime="2023-05-23T09:43:32+08:00">2023-05-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">技术</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF/%E7%BC%93%E5%AD%98/" itemprop="url" rel="index"><span itemprop="name">缓存</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="1-Redis安装和配置"><a href="#1-Redis安装和配置" class="headerlink" title="1.Redis安装和配置"></a>1.Redis安装和配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 先安装编译环境</span></span><br><span class="line">yum groupinstall <span class="string">&quot;Development tools&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /home/packages</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下载redis</span></span><br><span class="line">curl -O http://download.redis.io/releases/redis-5.0.0.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解压</span></span><br><span class="line">tar -zxf redis-*.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将解压的源码目录放到自己的应用目录</span></span><br><span class="line"><span class="built_in">mv</span> -f redis-5.0.0 /usr/local/redis</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /usr/local/redis</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编译安装, 编译问题可以自行搜索</span></span><br><span class="line">./configure</span><br><span class="line">make</span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试是否安装成功, 如果出现版本号说明已经安装成功</span></span><br><span class="line">redis-cli -v</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-修改配置"><a href="#2-修改配置" class="headerlink" title="2.修改配置"></a>2.修改配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi redis.conf</span><br></pre></td></tr></table></figure>
+<blockquote>
+<blockquote>
+<p>bind 192.168.1.100<br><br>port 6379<br><br>daemonize yes   # 是否需要以守护进程启动(如果为no, 启动后在前台, ctrl-c退出进程, 可以使用nohub的方式转入后台)<br><br>pidfile &#x2F;var&#x2F;run&#x2F;redis_6379.pid  # 可以自行选择目录, 但是确保已经建立好指定的目录再启动服务, 否则启动报错<br><br>logfile “&#x2F;var&#x2F;redis&#x2F;log&#x2F;6379.log” # 日志目录, 确保存在否则启动报错<br><br>dir &#x2F;var&#x2F;redis&#x2F;data # 数据存放目录(RDB和AOF共用), 确保存在否则启动报错<br><br>dbfilename 6379.rdb # rdb数据持久化文件<br><br>appendonly yes # 打开aof<br><br>appendfilename “6379.aof” # aof数据持久化文件<br><br>cluster-enabled yes # 集群配置, 开启时单实例机无法执行数据操作(get | set 等)<br><br>cluster-config-file nodes-6379.conf # 自动生成, 保存到上面指定的data目录<br>其他配置保持默认即可.<br>####启动服务推荐使用redis&#x2F;utils&#x2F;redis_init_script<br>为启动脚本建立软连接方便使用</p>
+</blockquote>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -s <span class="variable">$PWD</span>/utils/redis_init_script /usr/bin/redis</span><br><span class="line"></span><br><span class="line"><span class="comment"># 这个脚本默认读取的配置文件位置为 /etc/redis/$PORT.conf, 所以先在这个建立位置一个redis.conf的软连接,文件名为端口号</span></span><br><span class="line"><span class="built_in">mkdir</span> /etc/redis</span><br><span class="line"><span class="built_in">ln</span> -s <span class="variable">$PWD</span>/redis.conf /etc/redis/6379.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用方式如下</span></span><br><span class="line">redis [start | stop]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 要查看服务是否已经成功开启, 可根据端口查看或使用客户端连接一次</span></span><br><span class="line">netstat -npl | grep 6379 <span class="comment"># 部分系统版本需要安装net-tools</span></span><br></pre></td></tr></table></figure>
+
+<p>以上步骤顺利完成后, 就可以开始集群配置了, redis集群至少要求3主3从, 所以至少需要6个单实例服务, 可以通过单机6个配置的方式, 或多个宿主机的方式配置.</p>
+<h3 id="3-集群配置"><a href="#3-集群配置" class="headerlink" title="3.集群配置"></a>3.集群配置</h3><blockquote>
+<p>单机多配置</p>
+<blockquote>
+<p>只需要拷贝多份配置文件和启动脚本, 将这两个文件中的端口对应的值替换为不同的端口<br><br>特别需要注意的是单机配置多个redis时, 时刻记得–&gt;改端口,改端口,改端口&lt;– 不能两个服务重复使用同一个端口</p>
+</blockquote>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> ../redis2</span><br><span class="line"></span><br><span class="line"><span class="built_in">cp</span> redis.conf ../redis2/</span><br><span class="line"></span><br><span class="line"><span class="built_in">cp</span> utils/redis_init_script ../redis2</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> ../redis2</span><br><span class="line"></span><br><span class="line">sed -i s/6379/7379/ redis.conf</span><br><span class="line"></span><br><span class="line">sed -i s/6379/7379 redis_init_script</span><br><span class="line"></span><br><span class="line"><span class="built_in">ln</span> -s <span class="variable">$PWD</span>/redis.conf /etc/redis/7379.conf</span><br><span class="line"></span><br><span class="line">./redis_init_script start</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看服务是否成功启动, 如果没有出现进程, 查看日志排查问题(一般是指定的文件夹不存在)</span></span><br><span class="line">netstat -npl | grep 7379</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如法炮制其他4个吧, 配置好后6个实例都启动起来</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>多机配置<br><br>每个主机上运行一个redis其实没什么好写的,就是步骤1 和 2, 安装完成后开启服务就好了</p>
+</blockquote>
+<h3 id="4-安装ruby环境"><a href="#4-安装ruby环境" class="headerlink" title="4.安装ruby环境"></a>4.安装ruby环境</h3><p>redis对ruby的版本有要求, 目前CentOS7的仓库版本还是很低, 需要到官网下载安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果当前系统已经附带了一个低版本的ruby 需要先卸载</span></span><br><span class="line">yum erase ruby</span><br><span class="line"><span class="comment"># 如果是之前自己使用yum安装的, 完整回滚安装操作(remove或者erase不会卸载依赖型)</span></span><br><span class="line">yum <span class="built_in">history</span> list ruby</span><br><span class="line"><span class="comment"># 结果如下</span></span><br><span class="line"><span class="comment">#    ID | 命令行                   | 日期和时间       | 操作           | 变更数</span></span><br><span class="line"><span class="comment">#-------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#    25 | install ruby -y          | 2018-10-04 16:14 | Install        |    8</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 拿到ID后回滚之前的操作</span></span><br><span class="line">yum <span class="built_in">history</span> undo 25</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /home/packages</span><br><span class="line"></span><br><span class="line">curl -O https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.3.tar.gz</span><br><span class="line"></span><br><span class="line">tar -zxf ruby-2.5.3.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> ruby-2.5.3</span><br><span class="line"></span><br><span class="line">./configure --disable-install-doc <span class="comment"># 我是没安装文档, 如果需要的可以去掉后边的参数</span></span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查是否已经成功安装ruby</span></span><br><span class="line">ruby -v</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装gem</span></span><br><span class="line"><span class="built_in">cd</span> ..</span><br><span class="line"></span><br><span class="line">curl -O https://rubygems.org/rubygems/rubygems-2.7.7.zip</span><br><span class="line"></span><br><span class="line">unzip rubygems-2.7.7.zip</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> rubygems-2.7.7</span><br><span class="line"></span><br><span class="line">ruby setup.rb</span><br><span class="line"></span><br><span class="line">gem -v</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为ruby安装redis组件, 这一步可能比较慢</span></span><br><span class="line">gem install redis</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>至此, ruby环境也装好了, 可以开始建集群了</p>
+<h3 id="5-创建集群"><a href="#5-创建集群" class="headerlink" title="5. 创建集群"></a>5. 创建集群</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">redis-trib create --replicas 1 192.168.1.100:6379 192.168.1.100:7379 192.168.1.100:8379 192.168.1.100:9379 192.168.1.100:10379 192.168.1.100:11379</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果一切正常, 输出应该是长这样</span></span><br><span class="line"><span class="comment"># &gt;&gt;&gt; Creating cluster</span></span><br><span class="line"><span class="comment"># &gt;&gt;&gt; Performing hash slots allocation on 6 nodes...</span></span><br><span class="line"><span class="comment"># Using 3 masters:</span></span><br><span class="line"><span class="comment"># 192.168.25.110:6379</span></span><br><span class="line"><span class="comment"># 192.168.25.120:6379</span></span><br><span class="line"><span class="comment"># 192.168.25.210:6379</span></span><br><span class="line"><span class="comment"># Adding replica 192.168.25.120:7379 to 192.168.25.110:6379</span></span><br><span class="line"><span class="comment"># Adding replica 192.168.25.110:7379 to 192.168.25.120:6379</span></span><br><span class="line"><span class="comment"># Adding replica 192.168.25.220:6379 to 192.168.25.210:6379</span></span><br><span class="line"><span class="comment"># M: ed9332ea65afb70c615936bb69f3c0081e9ab472 192.168.25.110:6379</span></span><br><span class="line"><span class="comment">#    slots:0-5460 (5461 slots) master</span></span><br><span class="line"><span class="comment"># S: 281dc2be56b2dbe5c726c656b2b4b0017d396394 192.168.25.110:7379</span></span><br><span class="line"><span class="comment">#    replicates acae299367e8f5a742980ac6aa089baf5eb6b5a2</span></span><br><span class="line"><span class="comment"># M: acae299367e8f5a742980ac6aa089baf5eb6b5a2 192.168.25.120:6379</span></span><br><span class="line"><span class="comment">#    slots:5461-10922 (5462 slots) master</span></span><br><span class="line"><span class="comment"># S: caf5a016f022b6f33cd3317ef7dd643ce800131a 192.168.25.120:7379</span></span><br><span class="line"><span class="comment">#    replicates ed9332ea65afb70c615936bb69f3c0081e9ab472</span></span><br><span class="line"><span class="comment"># M: a0c41601d30159940c2bcccce08c3fad2406dfd0 192.168.25.210:6379</span></span><br><span class="line"><span class="comment">#    slots:10923-16383 (5461 slots) master</span></span><br><span class="line"><span class="comment"># S: 387442c1fbdad2a2f2c6f17506c3ebc4c01d55bc 192.168.25.220:6379</span></span><br><span class="line"><span class="comment">#    replicates a0c41601d30159940c2bcccce08c3fad2406dfd0</span></span><br><span class="line"><span class="comment"># Can I set the above configuration? (type &#x27;yes&#x27; to accept): yes</span></span><br><span class="line"><span class="comment"># &gt;&gt;&gt; Nodes configuration updated</span></span><br><span class="line"><span class="comment"># &gt;&gt;&gt; Assign a different config epoch to each node</span></span><br><span class="line"><span class="comment"># &gt;&gt;&gt; Sending CLUSTER MEET messages to join the cluster</span></span><br><span class="line"><span class="comment"># Waiting for the cluster to join.....</span></span><br><span class="line"><span class="comment"># &gt;&gt;&gt; Performing Cluster Check (using node 192.168.25.110:6379)</span></span><br><span class="line"><span class="comment"># M: ed9332ea65afb70c615936bb69f3c0081e9ab472 192.168.25.110:6379</span></span><br><span class="line"><span class="comment">#    slots:0-5460 (5461 slots) master</span></span><br><span class="line"><span class="comment">#    1 additional replica(s)</span></span><br><span class="line"><span class="comment"># M: a0c41601d30159940c2bcccce08c3fad2406dfd0 192.168.25.210:6379</span></span><br><span class="line"><span class="comment">#    slots:10923-16383 (5461 slots) master</span></span><br><span class="line"><span class="comment">#    1 additional replica(s)</span></span><br><span class="line"><span class="comment"># M: acae299367e8f5a742980ac6aa089baf5eb6b5a2 192.168.25.120:6379</span></span><br><span class="line"><span class="comment">#    slots:5461-10922 (5462 slots) master</span></span><br><span class="line"><span class="comment">#    1 additional replica(s)</span></span><br><span class="line"><span class="comment"># S: 387442c1fbdad2a2f2c6f17506c3ebc4c01d55bc 192.168.25.220:6379</span></span><br><span class="line"><span class="comment">#    slots: (0 slots) slave</span></span><br><span class="line"><span class="comment">#    replicates a0c41601d30159940c2bcccce08c3fad2406dfd0</span></span><br><span class="line"><span class="comment"># S: 281dc2be56b2dbe5c726c656b2b4b0017d396394 192.168.25.110:7379</span></span><br><span class="line"><span class="comment">#    slots: (0 slots) slave</span></span><br><span class="line"><span class="comment">#    replicates acae299367e8f5a742980ac6aa089baf5eb6b5a2</span></span><br><span class="line"><span class="comment"># S: caf5a016f022b6f33cd3317ef7dd643ce800131a 192.168.25.120:7379</span></span><br><span class="line"><span class="comment">#    slots: (0 slots) slave</span></span><br><span class="line"><span class="comment">#    replicates ed9332ea65afb70c615936bb69f3c0081e9ab472</span></span><br><span class="line"><span class="comment"># [OK] All nodes agree about slots configuration.</span></span><br><span class="line"><span class="comment"># &gt;&gt;&gt; Check for open slots...</span></span><br><span class="line"><span class="comment"># &gt;&gt;&gt; Check slots coverage...</span></span><br><span class="line"><span class="comment"># [OK] All 16384 slots covered.</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-问题解决"><a href="#6-问题解决" class="headerlink" title="6.问题解决"></a>6.问题解决</h3><pre><code>#### 6.1 问题1
+</code></pre>
+<blockquote>
+<p>创建集群出现如下错误<br></p>
+<blockquote>
+<p>rubygems&#x2F;core_ext&#x2F;kernel_require.rb:59:in &#96;require’: cannot load such file – redis (LoadError)<br></p>
+</blockquote>
+<p>这种还没开始执行创建就已经脚本错误的情况, 一般是没为ruby安装redis组件引起的, 参考 第4步</p>
+</blockquote>
+<pre><code>#### 6.2 问题2
+</code></pre>
+<blockquote>
+<p>创建集群的时候出现如下错误<br></p>
+<blockquote>
+<p>Can I set the above configuration? (type ‘yes’ to accept): yes<br>   &#x2F;usr&#x2F;local&#x2F;lib&#x2F;ruby&#x2F;gems&#x2F;2.4.0&#x2F;gems&#x2F;redis-4.0.2&#x2F;lib&#x2F;redis&#x2F;client.rb:119:in &#96;call’: ERR Slot 0 is already busy (Redis::CommandError)</p>
+</blockquote>
+<p>也就是提示槽xxx繁忙的时候, 将建立集群的每个节点清除数据并重置</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@leader1 redis]<span class="comment"># redis-cli -h leader1 6379</span></span><br><span class="line">leader1:6379&gt; flushall</span><br><span class="line">OK</span><br><span class="line">leader1:6379&gt; cluster reset</span><br><span class="line">OK</span><br><span class="line">leader1:6379&gt; quit</span><br><span class="line"></span><br><span class="line"><span class="comment"># 别的节点执行一样的操作</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="7-使用集群"><a href="#7-使用集群" class="headerlink" title="7.使用集群"></a>7.使用集群</h3><h4 id="使用客户端连接时-添加一个参数-c"><a href="#使用客户端连接时-添加一个参数-c" class="headerlink" title="使用客户端连接时, 添加一个参数 -c"></a>使用客户端连接时, 添加一个参数 -c</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">[root@leader1 redis2]<span class="comment"># redis-cli -h 192.168.1.100 -p 6379 -c</span></span><br><span class="line"><span class="comment"># 测试集群</span></span><br><span class="line">leader1:6379&gt; <span class="built_in">set</span> name sealin</span><br><span class="line">-&gt; Redirected to slot [5798] located at 192.168.25.120:6379</span><br><span class="line">OK</span><br><span class="line">192.168.25.120:6379&gt;</span><br><span class="line"><span class="comment"># 可以发现操作已经被重定向到了集群中的另一个节点</span></span><br><span class="line"><span class="comment"># 切换一个主机获取数据试试</span></span><br><span class="line">[root@leader1 redis2]<span class="comment"># redis-cli -h follower1 -c</span></span><br><span class="line">follower1:6379&gt; get name</span><br><span class="line">-&gt; Redirected to slot [5798] located at 192.168.25.120:6379</span><br><span class="line"><span class="string">&quot;sealin&quot;</span></span><br><span class="line">192.168.25.120:6379&gt;</span><br><span class="line"><span class="comment"># 同样的转向到了该节点获取数据</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看集群信息</span></span><br><span class="line">leader1:6379&gt; cluster info</span><br><span class="line">cluster_state:ok</span><br><span class="line">cluster_slots_assigned:16384</span><br><span class="line">cluster_slots_ok:16384</span><br><span class="line">cluster_slots_pfail:0</span><br><span class="line">cluster_slots_fail:0</span><br><span class="line">cluster_known_nodes:6</span><br><span class="line">cluster_size:3</span><br><span class="line">cluster_current_epoch:6</span><br><span class="line">cluster_my_epoch:1</span><br><span class="line">cluster_stats_messages_ping_sent:18037</span><br><span class="line">cluster_stats_messages_pong_sent:15989</span><br><span class="line">cluster_stats_messages_fail_sent:4</span><br><span class="line">cluster_stats_messages_sent:34030</span><br><span class="line">cluster_stats_messages_ping_received:15984</span><br><span class="line">cluster_stats_messages_pong_received:15745</span><br><span class="line">cluster_stats_messages_meet_received:5</span><br><span class="line">cluster_stats_messages_fail_received:3</span><br><span class="line">cluster_stats_messages_received:31737</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看节点信息</span></span><br><span class="line">leader1:6379&gt; cluster nodes</span><br><span class="line">a0c41601d30159940c2bcccce08c3fad2406dfd0 192.168.25.210:6379@16379 master - 0 1539966870000 3 connected 10923-16383</span><br><span class="line">acae299367e8f5a742980ac6aa089baf5eb6b5a2 192.168.25.120:6379@16379 master - 0 1539966869719 2 connected 5461-10922</span><br><span class="line">387442c1fbdad2a2f2c6f17506c3ebc4c01d55bc 192.168.25.220:6379@16379 slave a0c41601d30159940c2bcccce08c3fad2406dfd0 0 1539966871737 4 connected</span><br><span class="line">281dc2be56b2dbe5c726c656b2b4b0017d396394 192.168.25.110:7379@17379 slave acae299367e8f5a742980ac6aa089baf5eb6b5a2 0 1539966868710 5 connected</span><br><span class="line">caf5a016f022b6f33cd3317ef7dd643ce800131a 192.168.25.120:7379@17379 slave ed9332ea65afb70c615936bb69f3c0081e9ab472 0 1539966870729 4 connected</span><br><span class="line">ed9332ea65afb70c615936bb69f3c0081e9ab472 192.168.25.110:6379@16379 myself,master - 0 1539966863000 1 connected 0-5460</span><br></pre></td></tr></table></figure>
+<p>整个搭建流程到此结束了, 祝君好运.</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1/" rel="tag"># 基础服务</a>
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+              <a href="/tags/%E7%BC%93%E5%AD%98/" rel="tag"># 缓存</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/02/mysql-cluster/" rel="next" title="MySQL搭建主从同步数据库(一主多从)">
+      MySQL搭建主从同步数据库(一主多从) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Redis%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">1.Redis安装和配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">2.修改配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%9B%86%E7%BE%A4%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">3.集群配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%AE%89%E8%A3%85ruby%E7%8E%AF%E5%A2%83"><span class="nav-number">4.</span> <span class="nav-text">4.安装ruby环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%88%9B%E5%BB%BA%E9%9B%86%E7%BE%A4"><span class="nav-number">5.</span> <span class="nav-text">5. 创建集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="nav-number">6.</span> <span class="nav-text">6.问题解决</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E4%BD%BF%E7%94%A8%E9%9B%86%E7%BE%A4"><span class="nav-number">7.</span> <span class="nav-text">7.使用集群</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%BF%9E%E6%8E%A5%E6%97%B6-%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E5%8F%82%E6%95%B0-c"><span class="nav-number">7.1.</span> <span class="nav-text">使用客户端连接时, 添加一个参数 -c</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Sealin</p>
+  <div class="site-description" itemprop="description">不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sealin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

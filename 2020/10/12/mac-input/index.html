@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.0.0-rc1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.sealin.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="翻车用了一年mac自带的输入法, 本以为调教一段时间总会变得好使, 事实证明还是在下输了.比如打字的时候现在已经落下打全拼的后遗症了, 比如以前习惯的打”是”, 只需要打一个s一般空格就可以了, 默认第一个就是”是”字, 但是mac的输入法偏不, 过了这么久第一个80%的时间会打出”说”; 比如要打”的”, 以前打个d空格就可以了, mac自带的输入法80%几率可能会打出”到”…另外没办法在中文模">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MAC删除默认ABC输入法">
+<meta property="og:url" content="http://www.sealin.net/2020/10/12/mac-input/index.html">
+<meta property="og:site_name" content="Sealin">
+<meta property="og:description" content="翻车用了一年mac自带的输入法, 本以为调教一段时间总会变得好使, 事实证明还是在下输了.比如打字的时候现在已经落下打全拼的后遗症了, 比如以前习惯的打”是”, 只需要打一个s一般空格就可以了, 默认第一个就是”是”字, 但是mac的输入法偏不, 过了这么久第一个80%的时间会打出”说”; 比如要打”的”, 以前打个d空格就可以了, mac自带的输入法80%几率可能会打出”到”…另外没办法在中文模">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://www.sealin.net/images/2020/10/12/9cbb099b-e60c-43ed-b39a-b371b25e879f.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/10/12/9ad9700b-ee86-458e-8c34-6cfe7d47071c.png">
+<meta property="og:image" content="http://www.sealin.net/images/2020/10/12/11494556-a119-439c-ad56-640f3adb2d4f.png">
+<meta property="article:published_time" content="2020-10-12T13:06:26.000Z">
+<meta property="article:modified_time" content="2023-05-23T01:43:32.493Z">
+<meta property="article:author" content="Sealin">
+<meta property="article:tag" content="工具">
+<meta property="article:tag" content="基础服务">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.sealin.net/images/2020/10/12/9cbb099b-e60c-43ed-b39a-b371b25e879f.png">
+
+<link rel="canonical" href="http://www.sealin.net/2020/10/12/mac-input/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>MAC删除默认ABC输入法 | Sealin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Sealin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Sealin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">初闻不解词间意，再听已是曲中人。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/10/12/mac-input/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Sealin">
+      <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Sealin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MAC删除默认ABC输入法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-12 21:06:26" itemprop="dateCreated datePublished" datetime="2020-10-12T21:06:26+08:00">2020-10-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-23 09:43:32" itemprop="dateModified" datetime="2023-05-23T09:43:32+08:00">2023-05-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">工具</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7/%E6%8A%98%E8%85%BE%E5%AE%9E%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">折腾实录</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="翻车"><a href="#翻车" class="headerlink" title="翻车"></a>翻车</h1><p>用了一年mac自带的输入法, 本以为调教一段时间总会变得好使, 事实证明还是在下输了.<br>比如打字的时候现在已经落下打全拼的后遗症了, 比如以前习惯的打”是”, 只需要打一个s一般空格就可以了, 默认第一个就是”是”字, 但是mac的输入法偏不, 过了这么久第一个80%的时间会打出”说”; 比如要打”的”, 以前打个d空格就可以了, mac自带的输入法80%几率可能会打出”到”…另外没办法在中文模式下使用英文标点, 很误事.<br>为什么是80%?当你再次打出s准备选第二个选项的时候, 可能候选顺序已经变了<img src="/images/2020/10/12/9cbb099b-e60c-43ed-b39a-b371b25e879f.png" alt="image.png"></p>
+<h1 id="拖车"><a href="#拖车" class="headerlink" title="拖车"></a>拖车</h1><p>没辙, 还是放弃直接换某狗吧, 毕竟用了这么多年还是很顺手的.</p>
+<h1 id="修车"><a href="#修车" class="headerlink" title="修车"></a>修车</h1><p>用某狗有个问题, mac输入法默认了一个ABC输入法, 还不能在设置里面删除, 切换应用很可能自动变回ABC输入法, 又要⌘+空格切换一次, 似乎不太完美.<br>找到某乎一帖子<br><a href="https://www.zhihu.com/question/21459701/answer/478489248">https://www.zhihu.com/question/21459701/answer/478489248</a><br>大致方案如下:</p>
+<h2 id="扳手"><a href="#扳手" class="headerlink" title="扳手"></a>扳手</h2><p>PlistEdit Pro</p>
+<h2 id="找螺丝"><a href="#找螺丝" class="headerlink" title="找螺丝"></a>找螺丝</h2><p>~&#x2F;Library&#x2F;Preferences&#x2F;com.apple.HIToolbox.plist</p>
+<h2 id="拧螺丝"><a href="#拧螺丝" class="headerlink" title="拧螺丝"></a>拧螺丝</h2><p>找到enabled input source这个分组, 展开里面的明细(我这里有7个), 明细也能展开, 里面有3个键值对, 删掉name&#x3D;ABC的配置项</p>
+<h2 id="上路"><a href="#上路" class="headerlink" title="上路"></a>上路</h2><p>注销重新登录就好了<br><img src="/images/2020/10/12/9ad9700b-ee86-458e-8c34-6cfe7d47071c.png" alt="image.png"><br>不好意思, 配错图了<br><img src="/images/2020/10/12/11494556-a119-439c-ad56-640f3adb2d4f.png" alt="image.png"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag"># 工具</a>
+              <a href="/tags/%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1/" rel="tag"># 基础服务</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/09/13/dubbo-ip/" rel="prev" title="连接VPN后无法调试本地Dubbo服务的问题">
+      <i class="fa fa-chevron-left"></i> 连接VPN后无法调试本地Dubbo服务的问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/12/mac-vm-sn/" rel="next" title="mac vm 序列号">
+      mac vm 序列号 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BF%BB%E8%BD%A6"><span class="nav-number">1.</span> <span class="nav-text">翻车</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8B%96%E8%BD%A6"><span class="nav-number">2.</span> <span class="nav-text">拖车</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%AE%E8%BD%A6"><span class="nav-number">3.</span> <span class="nav-text">修车</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%B3%E6%89%8B"><span class="nav-number">3.1.</span> <span class="nav-text">扳手</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%BE%E8%9E%BA%E4%B8%9D"><span class="nav-number">3.2.</span> <span class="nav-text">找螺丝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%A7%E8%9E%BA%E4%B8%9D"><span class="nav-number">3.3.</span> <span class="nav-text">拧螺丝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E8%B7%AF"><span class="nav-number">3.4.</span> <span class="nav-text">上路</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Sealin</p>
+  <div class="site-description" itemprop="description">不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">76</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Sealin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
