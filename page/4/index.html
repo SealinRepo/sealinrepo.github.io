@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.sealin.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"www.sealin.net","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="不妄取, 不妄予, 不妄想, 不妄求;与人方便, 随遇而安。">
@@ -44,7 +44,7 @@
   };
 </script>
 
-  <title>Sealin</title>
+  <title>Sealin - 初闻不解词间意，再听已是曲中人。</title>
   
 
 
@@ -106,6 +106,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -125,11 +126,48 @@
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
   </ul>
 </nav>
 
 
 
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
 
 </div>
     </header>
@@ -155,7 +193,7 @@
     <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/23/jvm-25/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sealin">
       <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
     </span>
@@ -211,12 +249,12 @@
 
       
           
-        <div id="aplayer-xTPEXIDd" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-dZNkzkqx" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-xTPEXIDd"),
+            element: document.getElementById("aplayer-dZNkzkqx"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -337,7 +375,7 @@
     <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/23/jvm-24/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sealin">
       <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
     </span>
@@ -393,12 +431,12 @@
 
       
           
-        <div id="aplayer-XrzDMNVK" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-TJtMbahV" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-XrzDMNVK"),
+            element: document.getElementById("aplayer-TJtMbahV"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -540,7 +578,7 @@
     <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/23/jvm-23/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sealin">
       <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
     </span>
@@ -596,12 +634,12 @@
 
       
           
-        <div id="aplayer-vTZopxrQ" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-nigNAYOz" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-vTZopxrQ"),
+            element: document.getElementById("aplayer-nigNAYOz"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -697,7 +735,7 @@
     <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/23/jvm-22/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sealin">
       <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
     </span>
@@ -753,12 +791,12 @@
 
       
           
-        <div id="aplayer-jmViCTvW" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-xQupsWkk" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-jmViCTvW"),
+            element: document.getElementById("aplayer-xQupsWkk"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -854,7 +892,7 @@
     <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/23/jvm-21/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sealin">
       <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
     </span>
@@ -910,12 +948,12 @@
 
       
           
-        <div id="aplayer-Oulrjqxy" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-xRvSgEbT" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-Oulrjqxy"),
+            element: document.getElementById("aplayer-xRvSgEbT"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -1020,7 +1058,7 @@
     <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/23/jvm-20/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sealin">
       <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
     </span>
@@ -1076,12 +1114,12 @@
 
       
           
-        <div id="aplayer-ZyLPLhpj" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-cdyLYcni" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-ZyLPLhpj"),
+            element: document.getElementById("aplayer-cdyLYcni"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -1167,7 +1205,7 @@
     <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/22/jvm-19/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sealin">
       <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
     </span>
@@ -1223,12 +1261,12 @@
 
       
           
-        <div id="aplayer-IjHrAjuy" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-QSqljpSg" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-IjHrAjuy"),
+            element: document.getElementById("aplayer-QSqljpSg"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -1333,7 +1371,7 @@
     <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/22/jvm-18/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sealin">
       <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
     </span>
@@ -1389,12 +1427,12 @@
 
       
           
-        <div id="aplayer-ZkxYzviK" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-QDpnRreM" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-ZkxYzviK"),
+            element: document.getElementById("aplayer-QDpnRreM"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -1493,7 +1531,7 @@
     <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/22/jvm-17/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sealin">
       <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
     </span>
@@ -1549,12 +1587,12 @@
 
       
           
-        <div id="aplayer-DiEVuqWy" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-hOZDxMcm" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-DiEVuqWy"),
+            element: document.getElementById("aplayer-hOZDxMcm"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -1659,7 +1697,7 @@
     <link itemprop="mainEntityOfPage" href="http://www.sealin.net/2020/01/22/jvm-16/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.jpg">
       <meta itemprop="name" content="Sealin">
       <meta itemprop="description" content="不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。">
     </span>
@@ -1715,12 +1753,12 @@
 
       
           
-        <div id="aplayer-NzxArzng" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-cUFVhqyC" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-NzxArzng"),
+            element: document.getElementById("aplayer-cUFVhqyC"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -1884,6 +1922,8 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Sealin"
+      src="/images/avatar.jpg">
   <p class="site-author-name" itemprop="name">Sealin</p>
   <div class="site-description" itemprop="description">不妄取, 不妄予, 不妄想, 不妄求;<br>与人方便, 随遇而安。</div>
 </div>
@@ -1898,11 +1938,13 @@
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
+          
         <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
+          
         <span class="site-state-item-count">41</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
@@ -1940,6 +1982,26 @@
   </div>
 
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -1975,6 +2037,8 @@
 
 
 
+  
+<script src="/js/local-search.js"></script>
 
 
 
@@ -1984,11 +2048,47 @@
 
 
 
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
 
 
   
 
   
+
 
 </body>
 </html>
